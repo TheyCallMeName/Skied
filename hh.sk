@@ -1,0 +1,7 @@
+command /speed <integer>:
+	permission: speed
+	trigger:
+		set {_mode} to "walking" if player isn't flying, else ("flying")
+		set player's flight speed to arg-1/10 if {_mode} is "flying"
+		set player's walk speed to arg-1/10 if {_mode} is "walking"
+		send(player, "&aYou have set your %{_mode}% &aspeed to %arg-1%")

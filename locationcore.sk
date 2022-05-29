@@ -1,0 +1,39 @@
+command /setspawn:
+	permission: admin
+	trigger:
+		set {spawn} to player's location
+		
+
+command /spawn:
+	trigger:
+		teleport player to {spawn}
+		send "&6&lTELEPORT&7・Taking you to &6&nSpawn"
+		
+		
+command /setcrates:
+	permission: admin
+	trigger:
+		set {cratesarea} to player's location
+		
+
+command /crates:
+	trigger:
+		teleport player to {cratesarea}
+		send "&6&lTELEPORT&7・Taking you to &6&nCrates"
+		
+command /setmine:
+	permission: admin
+	trigger:
+		set {minearea} to player's location
+		
+
+command /mine:
+	trigger:
+		teleport player to {minearea}
+		send "&6&lTELEPORT&7・Taking you to &6&nMine"
+
+
+on death:
+	set death message to ""
+	wait 5 ticks
+	player command "spawn"

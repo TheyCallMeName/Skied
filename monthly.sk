@@ -1,0 +1,256 @@
+command /givemonthly <player>:
+	permission: super.admin
+	trigger:
+		give 1 of {monthlycrate} to arg 1
+		send "&e&lMONTHLY&b&lCRATES &7・You have recieved &e&n1&e Monthly&bCrates" to arg-1
+	
+command /givelink <player>:
+	permission: super.admin
+	trigger:
+		give 1 of {linklb} to arg-1
+		send "&7You have been given a &a*&b* &a&lL&b&lI&a&lN&b&lK &a&lL&b&lO&a&lO&b&lT&a&lB&b&lO&a&lX &b*&a*" to arg-1
+		
+
+on place:
+	if 1 of player's tool = {monthlycrate}:
+		cancel event
+		remove 1 of {monthlycrate} from player's inventory
+		broadcast "&6%player% &7opened a &6&l&nMONTHLY CRATE&7 and recieved:"
+		broadcast " "
+		set {_rew1} to random integer between 1 and 9
+		if {_rew1} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew1} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew1} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew1} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew1} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew1} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew1} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew1} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+		set {_rew2} to random integer between 1 and 9
+		if {_rew2} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew2} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew2} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew2} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew2} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew2} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew2} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew2} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+		set {_rew3} to random integer between 1 and 9
+		if {_rew3} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew3} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew3} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew3} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew3} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew3} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew3} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew3} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+		set {_rew4} to random integer between 1 and 9
+		if {_rew4} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew4} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew4} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew4} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew4} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew4} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew4} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew4} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+		set {_rew5} to random integer between 1 and 9
+		if {_rew5} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew5} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew5} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew5} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew5} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew5} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew5} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew5} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+		set {_rew6} to random integer between 1 and 9
+		if {_rew6} = 1:
+			add 3000000 to {stats::balance::%player%}
+			broadcast "&7・&a$3,000,000"
+		if {_rew6} = 2:
+			add 5000000 to {stats::balance::%player%}
+			broadcast "&7・&a$5,000,000"
+		if {_rew6} = 3:
+			add 300000 to {scrap::%player's uuid%}
+			broadcast "&7・&c300,000 Scrap"
+		if {_rew6} = 4:
+			add 500000 to {scrap::%player's uuid%}
+			broadcast "&7・&c500,000 Scrap"
+		if {_rew6} = 5:
+			console command "ss give %player% iron_golem 5"
+			broadcast "&7・&b5x Iron Golem Spawner"
+		if {_rew6} = 6:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"
+		if {_rew6} = 8:
+			console command "ss give %player% villager 5"
+			broadcast "&7・&b5x Villager Spawner"	
+		if {_rew6} = 9:
+			console command "seteularank %player% 1"
+			broadcast "&7・&3&lMANOS RANK &7[PERM]"
+
+		broadcast " "
+		broadcast "&7Get &6&nyour monthly crate&7 @ &6&n/buy"
+	if 1 of player's tool = {linklb}:
+		remove 1 of {linklb} from player's inventory
+		cancel event
+		set {_rew1} to a random integer between 1 and 5
+		if {_rew1} = 1:
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+		if {_rew1} = 2:
+			add 50000 to {scrap::%player's uuid%}
+			send "&7・You recieved &c50,000 SCRAP"
+		if {_rew1} = 3:
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			send "&7・You recieved &b5x RARE KEY"
+		if {_rew1} = 4:
+			chance of 10%:
+			
+				console command "seteularank %player% 1"
+				send "&7・You recieved &3&lMANOS RANK &7[PERM]"
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+			
+		if {_rew1} = 5:
+			console command "ss give %player% blaze 1"
+			send "&7・You recieved &6BLAZE SPAWNER"
+		set {_rew2} to a random integer between 1 and 5
+		if {_rew2} = 1:
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+		if {_rew2} = 2:
+			add 50000 to {scrap::%player's uuid%}
+			send "&7・You recieved &c50,000 SCRAP"
+		if {_rew2} = 3:
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			send "&7・You recieved &b5x RARE KEY"
+		if {_rew2} = 4:
+			chance of 10%:
+			
+				console command "seteularank %player% 1"
+				send "&7・You recieved &3&lMANOS RANK &7[PERM]"
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+			
+		if {_rew2} = 5:
+			console command "ss give %player% blaze 1"
+			send "&7・You recieved &6BLAZE SPAWNER"
+		set {_rew3} to a random integer between 1 and 5
+		if {_rew3} = 1:
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+		if {_rew3} = 2:
+			add 50000 to {scrap::%player's uuid%}
+			send "&7・You recieved &c50,000 SCRAP"
+		if {_rew3} = 3:
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			give 1 of prismarine shard named "&b&lRARE CRATE KEY" to player
+			send "&7・You recieved &b5x RARE KEY"
+		if {_rew3} = 4:
+			chance of 10%:
+			
+				console command "seteularank %player% 1"
+				send "&7・You recieved &3&lMANOS RANK &7[PERM]"
+			add 100000 to {stats::balance::%player%}
+			send "&7・You recieved &a$100,000"
+			
+		if {_rew3} = 5:
+			console command "ss give %player% blaze 1"
+			send "&7・You recieved &6BLAZE SPAWNER"
+
+		broadcast "&a&lLINK&7・&f%player%&7 Recieved &e⭐⭐⭐⭐⭐&7 Tier Rewards from a &a*&b* &a&lL&b&lI&a&lN&b&lK &a&lL&b&lO&a&lO&b&lT&a&lB&b&lO&a&lX &b*&a* &7( &a/link &7) "
+			
+			
+		
+			

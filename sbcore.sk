@@ -1,0 +1,624 @@
+# SKYBLOCK CORE MADE BY DONTSHARE
+# DO NOT DISTRIBUTE.
+# THIS IS A PAID SKRIPT.
+
+
+# EASY TO CHANGE OPTIONS
+
+options:
+	prefix: fontConverter("&6&lSKYBLOCK &8•")
+	max-island-name-length: 10
+	m: &6
+	o: &e
+	d: &7
+	fill: gray stained glass pane
+	border-1: black stained glass pane 
+	border-2: black stained glass pane
+
+
+on load:
+
+	registerHelpCommand("/is", "Island Member", "Opens the skyblock menu")
+	registerHelpCommand("/is help", "Island Member", "Displays this help menu for all the commands")
+	registerHelpCommand("/is create (name)", "Island Leader", "Create an island with a tag name")
+	registerHelpCommand("/is home", "Island Member", "Teleports you to your island home")
+	registerHelpCommand("/is invite (player)", "Island Leader", "Invites a player to your island")
+	registerHelpCommand("/is join (island)", "Island Member", "Joins an island that you have been invited to")
+	registerHelpCommand("/is visit (island)", "Island Member", "Visits an unlocked island")
+	registerHelpCommand("/is lock", "Island Leader", "Locks / Unlocks your island so guests cant teleport to your island")
+	registerHelpCommand("/is leave", "Island Member", "Leaves your current island")
+	registerHelpCommand("/is disband", "Island Leader", "Disbands your island (Chat confirmation)")
+	registerHelpCommand("/is kick (player)", "Island Leader", "Kicks a player from your island")
+	registerHelpCommand("/is ban (player, list)", "Island Leader", "bans a player from your island so they cant visit / or fly in your skyblock region.")
+
+on unload:
+	resetHelpCommands()
+
+function registerHelpCommand(command: string, perm: string, desc: string):
+	add {_command} to {Storage::commands::*}
+	set {Storage::commands::%{_command}%::perm} to {_perm}
+	set {Storage::commands::%{_command}%::desc::*} to formatDesc({_desc})
+
+function resetHelpCommands():
+	loop {Storage::commands::*}:
+		delete {Storage::commands::%loop-value%::perm}
+		delete {Storage::commands::%loop-value%::desc}
+		remove loop-value from {Storage::commands::*}
+	delete {Storage::commands::*}
+
+function formatDesc(text: text) :: texts:
+	set {_split::*} to {_text} split at " "
+	loop {_split::*}:
+		if {_str} is not set:
+			set {_str} to "%loop-value%"
+		else:
+			set {_str} to "%{_str}% %loop-value%"
+		if length of {_str} is greater than 30:
+			if {_return::*} is not set:
+				add "&8• {@o}Description: {@d}%{_str}%" to {_return::*}
+			else:
+				add "  {@d}%{_str}%" to {_return::*}
+			delete {_str}
+	if {_str} is set:
+		if {_return::*} is not set:
+			add "&8• {@o}Description: {@d}%{_str}%" to {_return::*}
+		else:
+			add "  {@d}%{_str}%" to {_return::*}
+	return {_return::*}
+
+function tooltip(text: text, lines: texts) :: text:
+	loop {_lines::*}:
+		if {_str} is not set:
+			set {_str} to "%loop-value%"
+		else:
+			set {_str} to "%{_str}%%nl%%loop-value%"
+	return "<tooltip:%{_str}%>%{_text}%<reset>"
+
+
+# COMMANDS
+
+command /savetemplate:
+	permission: *
+	permission message: "&cSorry, No permission"
+	trigger:
+		saveTemplate()
+		send "&aYou have saved the Skyblock Island Template" to player
+command /resetpoint:
+	permission: *
+	permission message: "&cSorry, No permission"
+	trigger:
+		set {Data::Structure-LoadPoint} to location(-4, 63, -4, world "Islands")
+		set {Data::StartingBlock} to location(0, 64, 0, world "Islands")
+
+command /admin-delete:
+	permission: *
+	permission message: "&cSorry, No permission"
+	trigger:
+		loop {Island-Names::*}:
+			delete bound with id "%loop-value%"
+			send "%loop-value%"
+		delete {Islands::*}, {Islands-Value::*}, {Islands-Home::*}, {Island-Names::*}, {Islands-Members::*}, {Islands-Radius::*}, {Islands-Invites::*}, {Islands-Disband::*}, {Islands-MemberCap::*}, {Islands-Owner::*}, {Islands-Lock::*}, and {Islands-Border::*}
+
+# CREATION FUNCTIONS
+
+function saveTemplate():
+	delete "SkyblockTemplate"
+	save structure between {Data::IslandTemplate::Pos1} and {Data::IslandTemplate::Pos2} as "SkyblockTemplate"
+function createIsland():
+	subtract 500 from z-coordinate of {Data::Structure-LoadPoint}
+	subtract 500 from z-coordinate of {Data::StartingBlock}
+	set {Data::Structure-LoadPoint} to location(-4, 63, -104, world "Islands") if {Data::Structure-LoadPoint} isn't set
+	set {Data::StartingBlock} to location(0, 64, -100, world "Islands") if {Data::StartingBlock} isn't set
+	load structure "SkyblockTemplate" at {Data::Structure-LoadPoint}
+function newIsland(p: player, str: string):
+	set {_u} to uuid of {_p}
+	createIsland()
+	set {Islands::%{_p}%} to {_str}
+	set {Islands-Owner::%{Islands::%{_p}%}%} to uuid of {_p}
+	set {Islands-MemberCap::%{Islands::%{_p}%}%} to 1
+	set {Islands-Lock::%{Islands::%{_p}%}%} to false 
+	set {Islands-Radius::%{Islands::%{_p}%}%} to "25x25"
+	set {Islands-Value::%{Islands::%{_p}%}%} to 0
+	add {_p} to {Islands-Members::%{Islands::%{_p}%}%::*}
+	add {_str} to {Island-Names::*}
+	set {Islands-Home::%{Islands::%{_p}%}%} to {Data::StartingBlock} ~ vector(0, 7, 1)
+	set {Islands-Border::%{Islands::%{_p}%}%::Loc1} to {Data::StartingBlock} ~ vector(12, -64, 12)
+	set {Islands-Border::%{Islands::%{_p}%}%::Loc2} to {Data::StartingBlock} ~ vector(-12, 256, -12)
+	create bound with id "%{_str}%" between {Islands-Border::%{Islands::%{_p}%}%::Loc1} and {Islands-Border::%{Islands::%{_p}%}%::Loc2}
+	wait 20 ticks
+	teleport {_p} to {Islands-Home::%{Islands::%{_p}%}%}
+function inIsland(p: player) :: boolean:
+	return true if {Islands::%{_p}%} is set
+	return false if {Islands::%{_p}%} isn't set
+
+
+# ISLAND COMMAND
+
+command /island [<text>] [<text>] [<text>]:
+	aliases: /is, /islands
+	trigger:
+		if arg-1 isn't set:
+			if inIsland(player) is false:
+				send(player, "&cDo &n/is help&r &cfor a list of commands.", "bass")
+			else:
+				islandMenu(player)
+		else if arg-1 isn't "Create" or "delete" or "go" or "Home" or "Invite" or "Join" or "Visit" or "Lock" or "Leave" or "Disband" or "Kick" or "Ban" or "Help":
+			if inIsland(player) is false:
+				send(player, "&cDo &n/is help&r &cfor a list of commands.", "bass")
+			else:
+				islandMenu(player)	
+		else if arg-1 is "Create":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide a name for your island.", "bass")
+			else if inIsland(player) is true:
+				send(player, "&cYou're already in an island!", "bass")
+			else if {Island-Names::*} contains arg-2:
+				send(player, "&cAn island with that name already exists!", "bass")
+			else if length of arg-2 > {@max-island-name-length}:
+				send(player, "&cYour island name can only be 7 characters long.", "bass")
+			else if length of arg-2 < 3:
+				send(player, "&cYour island name can't be shorter than 3 characters.", "bass")
+			else:
+				newIsland(player, arg-2)
+				send(player, "&aYou have created a new island named &f'&a%arg-2%&f'", "levelup")	
+		else if arg-1 is "Home" or "go":
+			if inIsland(player) is true:
+				teleport player to {Islands-Home::%{Islands::%player%}%}
+				send(player, "&fYou have teleported to your island.", "bit")
+			else:
+				send(player, "&cYou aren't in an island! &c&n/is create&r &cto create an island.", "bass")
+		else if arg-1 is "Invite":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide a player to invite.", "bass")
+			else:
+				set {_p} to arg-2 parsed as offlineplayer
+				if inIsland(player) is false:
+					send(player, "&cYou're not in an island!", "bass")
+				else if inIsland({_p}) is true:
+					send(player, "&c%{_p}% &cis already in an island!", "bass")
+				else if {Islands-Owner::%{Islands::%player%}%} is not player's uuid:
+					send(player, "&cYou must be the owner of the island to invite players!", "bass")
+				else if size of {Islands-Members::%{Islands::%player%}%::*} >= {Islands-MemberCap::%{Islands::%player%}%}:
+					send(player, "&cYour island is full! Upgrade your cap in /is.", "bass")
+				else:
+					islandInvite(player, {_p})
+					send(player, "&aYou have sent an island invite to %{_p}%&a. They have 15 seconds to accept it.", "bit")
+		else if arg-1 is "Join":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide an island to join.", "bass")
+			else if inIsland(player) is true:
+				send(player, "&cYou're already in an island!", "bass")
+			else if {Islands-Invites::%arg-2%::%player%} isn't true:
+				send(player, "&cYou haven't been invited to this island.", "bass")
+			else:
+				islandJoin(player, arg-2)
+		else if arg-1 is "Visit":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide an island to visit.", "bass")
+			else if {Island-Names::*} doesn't contain arg-2:
+				send(player, "&cAn island with that name doesn't exist.", "bass")
+			else if {Islands::%player%} matches arg-2:
+				send(player, "&cYou are in this island! Try /is home.", "bass")
+			else if {Islands-Lock::%arg-2%} is true:
+				send(player, "&cThat island is closed for visitors!", "bass")
+			else if {Islands-Bans::%arg-2%::*} contains player's uuid:
+				send(player, "&cYou are banned from this island!!", "bass")
+			else:
+				set {_bound::*} to bound at player
+				set {_b} to "%{_bound::1}%"
+				if {_b} matches arg-2:
+					send(player, "&cYou're already on this island!", "bass")
+				else:
+					teleport player to {Islands-Home::%arg-2%}
+					send(player, "&aYou are now visiting the island &f'&a%arg-2%&f'", "bit")
+					send formatted "<command:/is lock>&a%player% &ais visiting your island. to disable visitors &n/is lock. &8(&aClick here to toggle&8)&r<reset>" to {Islands-Members::%arg-2%::*}
+					playSound({Islands-Members::%arg-2%::*}, "bit")
+		else if arg-1 is "Lock":
+			if inIsland(player) is false:
+				send(player, "&cYou aren't on an island!", "bass")
+			else if {Islands-Owner::%{Islands::%player%}%} isn't player's uuid:
+				send(player, "&cYou aren't the owner of this island!", "bass")
+			else:
+				if {Islands-Lock::%{Islands::%player%}%} is true:
+					set {Islands-Lock::%{Islands::%player%}%} to false
+					send({Islands-Members::%{Islands::%player%}%::*}, "&a%player% &ahas unlocked the island for visitors", "bits")
+				else if {Islands-Lock::%{Islands::%player%}%} is false:
+					set {Islands-Lock::%{Islands::%player%}%} to true
+					send({Islands-Members::%{Islands::%player%}%::*}, "&c%player% &chas locked the island for visitors", "bits")	
+				else:
+					send(player, "&cAn unknown error has occured.", "bass")	
+					set {Islands-Lock::%{Islands::%player%}%} to false
+		else if arg-1 is "Leave":
+			if inIsland(player) is false:
+				send(player, "&cYou aren't on an island!", "bass")
+			else if {Islands-Owner::%{Islands::%player%}%} is player's uuid:
+				send(player, "&cThe owner can't leave the island! Do /is disband to disband your island.", "bass")			
+			else:
+				islandLeave(player)
+		else if arg-1 is "Disband" or "delete":
+			if inIsland(player) is false:
+				send(player, "&cYou aren't on an island!", "bass")
+			else if {Islands-Owner::%{Islands::%player%}%} isn't player's uuid:
+				send(player, "&cOnly the owner of the island can disband the island!", "bass")
+			else:
+				if {Islands-Disband::%player%} isn't set:
+					set {Islands-Disband::%player%} to true
+					send(player, "&aType ""CONFIRM"" in chat to disband the island.", "pling")
+		else if arg-1 is "Kick":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide a player to kick.", "bass")
+			if inIsland(player) is false:
+				send(player, "&cYou aren't on an island!", "bass")
+			else:
+				set {_p} to arg-2 parsed as offlineplayer
+				if {Islands-Owner::%{Islands::%player%}%} isn't player's uuid:
+					send(player, "&cOnly the owner of the island can kick players", "bass")
+				else if {Islands::%{_p}%} isn't {Islands::%player%}:
+					send(player, "&cThis player isn't in your island!", "bass")
+				else:
+					remove {_p} from {Islands-Members::%{Islands::%player%}%::*}
+					send({Islands-Members::%{Islands::%player%}%::*}, "&c%player% &chas kicked &c%{_p}% &cfrom the island. (%size of {Islands-Members::%{Islands::%{_p}%}%::*}%&c/%{Islands-MemberCap::%{Islands::%{_p}%}%}%&c)", "bit")
+					send({_p}, "&cYou have been kicked from your island", "bit")
+					delete {Islands::%{_p}%}
+					teleport {_p} to {Spawn}
+		else if arg-1 is "Ban":
+			if arg-2 isn't set:
+				send(player, "&cPlease provide the correct argument (List, Player).", "bass")
+			else if inIsland(player) is false:
+				send(player, "&cYou aren't on an island!", "bass")
+			else:
+				if arg-2 isn't "List":
+					set {_p} to arg-2 parsed as offlineplayer
+					if {Islands-Owner::%{Islands::%player%}%} isn't player's uuid:
+						send(player, "&cOnly the owner of the island can ban players", "bass")		
+					else if {_p} hasn't played before:
+						send(player, "&cThis player has never played before!", "bass")	
+					else if {Islands::%{_p}%} is {Islands::%player%}:
+						send(player, "&cYou can't ban your own members! Try &n/is kick (Player)&r&c.", "bass")		
+					else:
+						add {_p} to {Islands-Bans::%{Islands::%player%}%::*}
+						send({Islands-Members::%{Islands::%player%}%::*}, "&c%player% &chas banned %{_p}% &cfrom the island.", "bit")
+				else:
+					if size of {Islands-Bans::%{Islands::%player%}%::*} > 0: 
+						send "&4&lBANNED MEMBERS%nl%&r" to player
+						playSound(player, "bit")
+						loop {Islands-Bans::%{Islands::%player%}%::*}:
+							send "&8• &c%loop-value%"
+					else:
+						send(player, "&cThere are no banned members to list.", "bass")
+		else if arg-1 is "help":
+			send "&8&m                                                          " to player
+			send "&6&lSKYBLOCK COMMANDS" to player
+			loop {Storage::commands::*}:
+				send formatted tooltip("&8• {@o}%loop-value%", ("{@m}&l%loop-value%{@m}&l:", "&7", "&8• {@o}Permission: &f%{Storage::commands::%loop-value%::perm}%", {Storage::commands::%loop-value%::desc::*}, and "&7")) to player
+			send "&7&oHover to view descriptions of the commands"
+			send "&8&m                                                          " to player
+			playSound(player, "exp")
+
+command /redeem:
+	trigger:
+		loop all items in player's inventory:
+			if name of loop-value contains "&6&lVALUE BLOCK":
+				set {_amount} to amount of loop-value in player's inventory
+				add 5*{_amount} to {_totalValue} if name of loop-value is "&6&lVALUE BLOCK 5"
+				add 10*{_amount} to {_totalValue} if name of loop-value is "&6&lVALUE BLOCK 10"
+				add 25*{_amount} to {_totalValue} if name of loop-value is "&6&lVALUE BLOCK 25"
+				remove loop-value from player's inventory
+		if {_totalValue} > 0:
+			send({Islands-Members::%{Islands::%player%}%::*}, "&a%player% &ahas redeemed &f%format({_totalValue}, 2) ? 0% &avalue.", "pling")
+			add {_totalValue} to {Islands-Value::%{Islands::%player%}%}	
+		else:
+			send(player, "&cThere's no value blocks in your inventory!", "bass")
+
+command /value:
+	aliases: /isvalue
+	trigger:
+		create a new gui with virtual hopper named "Value Shop":
+			format gui slot (integers between 0 and 5) with black stained glass pane named "&f"
+			format gui slot 1 with {Heads::Value5} named "&6&lPURCHASE 5 VALUE" with lore "&7This will give you a value%nl%&7block that gives 5 value.%nl%&r%nl%&fCost for 1: &a$25K%nl%&fCost for 64: &a$%format(25000*64, 2)%%nl%&f%nl%&fLeft-Click to Buy x1%nl%&fRight-Click to buy x64":
+				purchaseValue(player, 25000, 5, 1) if "%clicked type%" contains "LEFT"
+				purchaseValue(player, 25000, 5, 2) if "%clicked type%" contains "RIGHT"
+			format gui slot 2 with {Heads::Value10} named "&6&lPURCHASE 10 VALUE" with lore "&7This will give you a value%nl%&7block that gives 10 value.%nl%&r%nl%&fCost for 1: &a$50K%nl%&fCost for 64: &a$%format(50000*64, 2)%%nl%&f%nl%&fLeft-Click to Buy x1%nl%&fRight-Click to buy x64":
+				purchaseValue(player, 50000, 10, 1) if "%clicked type%" contains "LEFT"
+				purchaseValue(player, 50000, 10, 2) if "%clicked type%" contains "RIGHT"
+			format gui slot 3 with {Heads::Value25} named "&6&lPURCHASE 25 VALUE" with lore "&7This will give you a value%nl%&7block that gives 25 value.%nl%&r%nl%&fCost for 1: &a$115K%nl%&fCost for 64: &a$%format(115000*64, 2)%%nl%&f%nl%&fLeft-Click to Buy x1%nl%&fRight-Click to buy x64":
+				purchaseValue(player, 115000, 25, 1) if "%clicked type%" contains "LEFT"
+				purchaseValue(player, 115000, 25, 2) if "%clicked type%" contains "RIGHT"
+		open last gui to player
+
+function purchaseValue(p: player, cost: integer, tier: integer, type: integer):
+	if {_type} is 1:
+		if {stats::balance::%{_p}%} >= {_cost}:
+			remove {_cost} from {stats::balance::%{_p}%}
+			give {_p} 1 of {Heads::Value%{_tier}%} named "&6&lVALUE BLOCK %{_tier}%" with lore "&7This item gives &e%{_tier}%%nl%&7value.%nl%&r%nl%&f&n/redeem to redeem value."
+			send({_p}, "&aYou have purchased a value block which gives %{_tier}% &avalue. /redeem to redeem all value.", "pling")
+		else:
+			send({_p}, "&cYou don't have enough for this! You need $%{stats::balance::%{_p}%}-{_cost}% &cmore.", "bass")
+	else if {_type} is 2:
+		if {stats::balance::%{_p}%} >= {_cost}*64:
+			remove {_cost}*64 from {stats::balance::%{_p}%}
+			give {_p} 64 of {Heads::Value%{_tier}%} named "&6&lVALUE BLOCK %{_tier}%" with lore "&7This item gives &e%{_tier}%%nl%&7value.%nl%&r%nl%&f&n/redeem to redeem value."
+			send({_p}, "&aYou have purchased 64 value blocks which gives %{_tier}% &avalue. /redeem to redeem all value.", "pling")
+		else:
+			send({_p}, "&cYou don't have enough for this! You need $%{stats::balance::%{_p}%}-{_cost}*64% &cmore.", "bass")	
+on chat:
+	if {Islands-Disband::%player%} is true:
+		if message is "Confirm":
+			delete {Islands-Disband::%player%}
+			remove {Islands::%player%} from {Island-Names::*}
+			set {_i} to {Islands::%player%}
+			loop {Islands-Members::%{Islands::%player%}%::*}:
+				send(loop-value, "&c%player% &chas disbanded the island.", "pling")
+				teleport loop-value to {Spawn}
+				delete {Islands-MemberCap::%{_i}%}, {Islands-Home::%{_i}%}, {Islands-Invites::%{_i}%::*}, {Islands-Value::%{_i}%}
+				remove loop-value from {Islands-Members::%{_i}%::*}
+			delete {Islands::%player%}
+			cancel event
+		else:
+			delete {Islands-Disband::%player%}
+			send(player, "&cYou have cancelled the disbanding.", "bit")
+			cancel event
+				
+function islandLeave(p: player):
+	remove {_p} from {Islands-Members::%{Islands::%{_p}%}%::*}
+	send({Islands-Members::%{Islands::%{_p}%}%::*}, "&c%{_p}% &chas left your island. (%size of {Islands-Members::%{Islands::%{_p}%}%::*}%&c/%{Islands-MemberCap::%{Islands::%{_p}%}%}%&c)", "pling")
+	delete {Islands::%{_p}%}
+	send({_p}, "&cYou have left your island.", "pling")
+	wait 3 ticks
+	teleport {_p} to {Spawn}
+
+function islandJoin(p: player, island: text):
+	set {Islands::%{_p}%} to {_island}
+	add {_p} to {Islands-Members::%{Islands::%{_p}%}%::*}
+	send({Islands-Members::%{Islands::%{_p}%}%::*}, "&a%{_p}% &ahas joined your island. (%size of {Islands-Members::%{Islands::%{_p}%}%::*}%&a/%{Islands-MemberCap::%{Islands::%{_p}%}%}%&a)", "levelup")
+	send({_p}, "&aYou have joined the island %{_island}%", "levelup")
+	delete {Islands-Invites::%{Islands::%{_p}%}%::%{_p}%}
+	set {Islands::%{_p}%::Joined} to now
+	teleport {_p} to {Islands-Home::%{Islands::%{_p}%}%}
+
+function islandInvite(p: player, o: player):
+	set {Islands-Invites::%{Islands::%{_p}%}%::%{_o}%} to true
+	send formatted "<command:/is join %{Islands::%{_p}%}%>%fontConverter("&6&lSKYBLOCK &8•")% &aYou have been invited to the island &f%{Islands::%{_p}%}%&a. &8(&aClick here to join or /is join %{Islands::%{_p}%}%&8)<reset>" to {_o}
+	wait 15 seconds
+	if {Islands-Invites::%{Islands::%{_p}%}%::%{_o}%} is set:
+		send formatted "%fontConverter("&6&lSKYBLOCK &8•")% &cYour invite to %{Islands::%{_p}%}% &chas expired." to {_o}
+		delete {Islands-Invites::%{Islands::%{_p}%}%::%{_o}%}
+
+# GUI
+
+function islandMenu(p: player):
+	playSound({_p}, "click")
+	create a new gui with virtual chest inventory with 3 rows named "Island (%{Islands::%{_p}%}%)":
+		format gui slot (integers between 0 and 26) with {@fill} named "&7"
+		format gui slot 0,1,2,3,4,5,6,7,8,9,17,18,19,20,21,22,23,24,25, and 26 with {@border-1} named "&7"
+		format gui slot 11 with {Heads::Upgrade} named "&6&lISLAND UPGRADES" with lore "&7This will display the island%nl%&7upgrades.%nl%&r%nl%&f&nLeft-Click to Open.":
+			upgradeMenu({_p})
+		format gui slot 13 with {Heads::Home} named "&6&lISLAND HOME" with lore "&7This will teleport you to%nl%&7your island home.%nl%&r%nL%&f&nLeft-Click to Warp.":
+			{_p} command "/is Home"
+		format gui slot 15 with {Heads::Info} named "&6&lISLAND INFO" with lore "&7This displays all your island%nl%&7information.%nl%&r%nl%&6&lBasic Information%nl% &fMembers: &e%size of {Islands-Members::%{Islands::%{_p}%}%::*}%&e/%{Islands-MemberCap::%{Islands::%{_p}%}%}%%nl% &fIsland Value: &e%format({Islands-Value::%{Islands::%{_p}%}%}, 2) ? 0%%nl% &fIsland Leader: &e%{Islands-Owner::%{Islands::%{_p}%}%} parsed as offlineplayer%%nl%&f%nl%&f&nLeft-Click for Member Breakdown.":
+			infoMenu({_p})
+	open last gui to {_p}
+
+function upgradeMenu(p: player):
+	playSound({_p}, "click")
+	create a new gui with virtual chest inventory with 3 rows named "Island Upgrades (%{Islands::%{_p}%}%)":
+		format gui slot (integers between 0 and 26) with {@fill} named "&7"
+		format gui slot 0,1,2,3,4,5,6,7,8,9,17,18,19,20,21,22,23,24,25, and 26 with {@border-1} named "&7"
+		format gui slot 12 with {Heads::UpgradeSize} named "&6&lUPGRADE ISLAND RADIUS" with lore "&7This will upgrade your%nl%&7max island radius by 20.%nl%&r%nl%&fCost: &a$50,000%nl%&fCurrent Radius: &a%{Islands-Radius::%{Islands::%{_p}%}%}%%nl%&fMax Size: &a185x185%nl%&r%nl%&f&nLeft-Click to Purchase.":
+			if {Islands-Owner::%{Islands::%{_p}%}%} is uuid of {_p}:
+				if {stats::balance::%{_p}%} >= 50000:
+					if {Islands-Radius::%{Islands::%{_p}%}%} isn't "185x185":
+						remove 50000 from {stats::balance::%{_p}%}
+						set {Islands-Radius::%{Islands::%{_p}%}%} to getRadius({_p}, {Islands-Radius::%{Islands::%{_p}%}%})
+						increaseRadius({_p})
+						send({Islands-Members::%{Islands::%{_p}%}%::*}, "&a%{_p}% &ahas upgraded your island radius to %{Islands-Radius::%{Islands::%{_p}%}%}%&a.", "leveup")
+						upgradeMenu({_p})
+					else:
+						send({_p}, "&cYou hit the max level of radius upgrades.", "bass")
+				else:
+					send({_p}, "&cInsufficient Funds.", "bass")
+			else:
+				send({_p}, "&cOnly the owner of the island can do this!", "bass")
+		format gui slot 14 with {Heads::UpgradeCap} named "&6&lUPGRADE MEMBER CAP" with lore "&7This will upgrade your%nl%&7member cap size by 1.%nl%&r%nl%&fCost: &a$50,000%nl%&fCurrent Cap: &a%{Islands-MemberCap::%{Islands::%{_p}%}%}%%nl%&fMax Cap: &a10%nl%&r%nl%&f&nLeft-Click to Purchase.":
+			if {Islands-Owner::%{Islands::%{_p}%}%} is uuid of {_p}:
+				if {Islands-MemberCap::%{Islands::%{_p}%}%} < 10:
+					if {stats::balance::%{_p}%} >= 50000:
+						remove 50000 from {stats::balance::%{_p}%}
+						add 1 to {Islands-MemberCap::%{Islands::%{_p}%}%}
+						send({Islands-Members::%{Islands::%{_p}%}%::*}, "&a%{_p}% &ahas upgraded your island member cap to %{Islands-MemberCap::%{Islands::%{_p}%}%}%&a.", "leveup")
+						upgradeMenu({_p})
+					else:
+						send({_p}, "&cInsufficient Funds.", "bass")
+				else:
+					send({_p}, "&cYou hit the max level of member cap upgrades.", "bass")
+			else:
+				send({_p}, "&cOnly the owner of the island can do this!", "bass")
+		format gui slot 18 with {Heads::Back} named "&c&lGO BACK" with lore "&7This will bring you%nl%&7back to the main page.%nl%&r%nl%&f&nLeft-Click to go Back.":
+			islandMenu({_p})
+	open last gui to {_p}
+
+function infoMenu(p: player):
+	playSound({_p}, "click")
+	create a new gui with virtual chest inventory with 4 rows named "Island Info (%{Islands::%{_p}%}%)":
+		format gui slot 0,1,2,3,4,5,6,7,8,9,17,18,26,27,28,29,30,31,32,33,34, and 35 with {@border-1} named "&7"
+		set {_online} to "&aOnline" if "%{Islands-Owner::%{Islands::%{_p}%}%}%" parsed as offlineplayer is online
+		set {_online} to "&cOffline" if "%{Islands-Owner::%{Islands::%{_p}%}%}%" parsed as offlineplayer is offline
+		set {_leader} to {Islands-Owner::%{Islands::%{_p}%}%} parsed as offlineplayer
+		format gui slot 4 with skull of {_leader} named "&6&l%{_leader}%" with lore "&7This is your leader of%nl%&7your island.%nl%&r%nl%&fStatus: %{_online}%%nl%&fBalance: &a$%format({stats::balance::%{_leader}%}, 2) ? 0%"
+		set {_start} to 10
+		set {_members::*} to {Islands-Members::%{Islands::%{_p}%}%::*}
+		remove {_leader} from {_members::*}
+		loop {_members::*}:
+			set {_player} to ("%loop-value%" parsed as offline player)
+			set {_skull} to skull of ("%{_player}%" parsed as offline player)
+			set {_online} to "&aOnline" if {_player} is online
+			set {_online} to "&cOffline" if {_player} is offline
+			format gui slot {_start} with {_skull} named "&6&l%{_player}%" with lore "&7Viewing %loop-value%%nl%&r%nl%&fStatus: %{_online}%%nl%&fBalance: &a$%format({stats::balance::%{_player}%}, 2) ? 0%%nl%&fJoined: &e%{Islands::%{_player}%::Joined}%"
+			add 1 to {_start}
+			add 3 to {_start} if {_start} is 16
+#		set {_count} to 15-{_start}
+#		loop {_count}:
+#			format gui slot {_count} with skull of ("MHF_Question" parsed as an offlineplayer) named "&7Empty Slot"
+
+		format gui slot 27 with {Heads::Back} named "&c&lGO BACK" with lore "&7This will bring you%nl%&7back to the main page.%nl%&r%nl%&f&nLeft-Click to go Back.":
+			islandMenu({_p})
+
+	open last gui to {_p}
+
+# UPGRADES
+
+function increaseRadius(p: offline player):
+	set {Islands-Border::%{Islands::%{_p}%}%::Loc1} to {Islands-Border::%{Islands::%{_p}%}%::Loc1} ~ vector(10,0,10)
+	set {Islands-Border::%{Islands::%{_p}%}%::Loc2} to {Islands-Border::%{Islands::%{_p}%}%::Loc2} ~ vector(-10,0,-10)
+	delete bound with id "%{Islands::%{_p}%}%"
+	wait 2 ticks
+	create bound with id "%{Islands::%{_p}%}%" between {Islands-Border::%{Islands::%{_p}%}%::Loc1} and {Islands-Border::%{Islands::%{_p}%}%::Loc2}
+
+function getRadius(p: player, t: text) :: text:
+	if {Islands-Radius::%{Islands::%{_p}%}%} is "25x25":
+		return "45x45"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "45x45":
+		return "65x65"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "65x65":
+		return "85x85"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "85x85":
+		return "105x105"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "105x105":
+		return "125x125"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "125x125":
+		return "145x145"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "145x145":
+		return "165x165"
+	else if {Islands-Radius::%{Islands::%{_p}%}%} is "165x165":
+		return "185x185"
+
+# REGION PROTECTION
+
+on bound enter:
+	if player is in world "Islands":
+		if player is not op:
+			set {_b} to "%event-bound%"
+			if {Islands-Bans::%{_b}%::*} contains player:
+				cancel event
+				send(player, "&cYou are banned from this island.", "bass")	
+
+on bound exit:
+	if player is in world "Islands":
+		if player is not op:
+			cancel event
+
+on break:
+	if player is in world "Islands":
+		if player's gamemode is not creative:
+			set {_bound::*} to bound at player
+			set {_b} to "%{_bound::1}%"
+			if {Islands::%player%} isn't set:
+				cancel event
+			else if {_b} doesn't match {Islands::%player%}:
+				cancel event
+				send(player, "&cYou can't break blocks here", "bass")
+			else if {Islands-Coop::%player%::%{_b}%} is set:
+				stop
+on place:
+	if player is in world "Islands":
+		if name of player's tool contains "&6&lVALUE BLOCK":
+			cancel event
+		else if player's gamemode is not creative:
+			set {_bound::*} to bound at player
+			set {_b} to "%{_bound::1}%"
+			if {Islands::%player%} isn't set:
+				cancel event
+			else if {_b} doesn't match {Islands::%player%}:
+				cancel event
+				send(player, "&cYou can't place blocks here", "bass")
+			else if {Islands-Coop::%player%::%{_b}%} is set:
+				stop
+on right click:
+	if player is in world "Islands":
+		if player's gamemode is not creative:
+			if event-block is any trapdoor or any door or any button or lever or chest or ender chest or hopper or dropper or dispenser or enchanting table or anvil:
+				set {_bound::*} to bound at player
+				set {_b} to "%{_bound::1}%"
+				if {Islands::%player%} isn't set:
+					cancel event
+				else if {_b} doesn't match {Islands::%player%}:
+					cancel event
+					send(player, "&cYou can't interact with blocks here", "bass")
+				if {Islands-Coop::%player%::%{_b}%} is set:
+					stop
+
+
+# TAB COMPlETIONS
+
+on tab complete for "/is":
+	set tab completions for position 1 to "create", "home", "visit", "lock", "kick", "ban", "disband", "leave", "join", "invite"
+	if tab arg-1 is "visit" or "join":
+		set tab completions for position 2 to {Island-Names::*}
+	else if tab arg-1 is "invite" or "ban":
+		set tab completions for position 2 to all players
+	else if tab arg-1 is "kick":
+		set tab completions for position 2 to {Islands-Members::%{Islands::%player%}%::*}
+
+
+# LEADERBOARD
+
+command /istop:
+	trigger:
+		playSound(player, "click")
+		send "&6&l&nISLAND TOP"
+		send " "
+		isTopMenu(player)
+
+
+function isTopMenu(p: player):
+	
+	set {_top::*} to sorted {Islands-Value::*} from highest to lowest with format "@index"
+	wait 1 tick
+	set {_i} to 0
+	set {_topnumber} to 1
+	set {_size} to size of {_top::*}
+	loop {_top::*}:
+		set {_island} to ("%loop-value%" parsed as offline player)
+		set {_uuid} to ({_player} parsed as offline player)'s uuid
+		set {_color} to "&a" if {_topnumber} is 1
+		set {_color} to "&e" if {_topnumber} is 2
+		set {_color} to "&c" if {_topnumber} is 3
+		set {_color} to "&7" if {_color} isn't set
+		send "&7(%{_color}%##%{_topnumber}%&7) &f%{_island}% &8・&6%{Islands-Value::%loop-value%}%V" to {_p}
+		add 1 to {_topnumber}
+		add 1 to {_i}
+		if {_topnumber} > 10:
+			exit loop
+	send " " to {_p}
+	send "&7Obtain value with &6/value" to {_p}
+
+command /baltop:
+	trigger:
+		playSound(player, "click")
+		baltopMenu(player)
+
+function baltopMenu(p: player):
+	create a new gui with virtual chest inventory with 5 rows named "Balance Top":
+		format gui slot (integers between 0 and 60) with black glass pane named " "
+		format gui slot 13,21,23,28,29,30,31,32,33 and 34 with skull of ("MHF_Question" parsed as an offlineplayer) named "&7Empty..."
+		set {_top::*} to sorted {stats::balance::*} from highest to lowest with format "@index"
+		wait 1 tick
+		set {_i} to 0
+		set {_slots::*} to 13, 21, 23, 28, 29, 30, 31, 32, 33 and 34
+		set {_topnumber} to 1
+		set {_size} to size of {_top::*}
+		loop {_top::*}:
+			set {_player} to ("%loop-value%" parsed as offline player)
+			set {_skull} to skull of ("%{_player}%" parsed as offline player)
+			set {_color} to "&a" if {_topnumber} is 1
+			set {_color} to "&e" if {_topnumber} is 2
+			set {_color} to "&c" if {_topnumber} is 3
+			set {_color} to "&7" if {_topnumber} > 3
+			set {_slot} to first element out of {_slots::*}
+			remove {_slot} from {_slots::*}
+			format gui slot {_slot} with {_skull} named "&6&l%{_player}% &6&l(%{_color}%##%{_topnumber}%&6&l)" with lore "%nl% &8• &fBalance: &a$%{stats::balance::%loop-value%}%"
+			add 1 to {_topnumber}
+			add 1 to {_i}
+			#if {_topnumber} > 10:
+			#	stop
+	open last gui to {_p}

@@ -1,0 +1,124 @@
+# DO NOT DISTRIBUTE.
+# THIS IS A PAID SKRIPT.
+
+options:
+	prefix: fontConverter("&6&lSKYBLOCK &8•")
+	m: &6
+	o: &e
+	d: &7
+	enable-prefix: true
+
+
+function fontConverter(t: text) :: text:
+	loop split "a,ᴀ|b,ʙ|c,ᴄ|d,ᴅ|e,ᴇ|f,ꜰ|g,ɢ|h,ʜ|i,ɪ|j,ᴊ|k,ᴋ|l,ʟ|m,ᴍ|n,ɴ|o,ᴏ|p,ᴘ|q,Q|r,ʀ|s,ꜱ|t,ᴛ|u,ᴜ|v,ᴠ|w,ᴡ|x,x|y,ʏ|z,ᴢ" at "|":
+		set {_t::*} to split loop-value at ","
+		replace all {_t::1} with {_t::2} in {_t}
+	return {_t}
+
+
+function send(target: offlineplayer, msg: string, sound: string = "null"):
+	if {@enable-prefix} is true:
+		message formatted "%{@prefix}% %colored {_msg}%" to {_target}
+	else:
+		message formatted colored {_msg} to {_target}
+	{_sound} is not "null"
+	{_target} is a offlineplayer
+	playSound({_target}, {_sound})
+
+
+function playSound(player: offlineplayer, sound: string):
+	if {_sound} is "click" or "buttonclick":
+		play sound "UI_BUTTON_CLICK" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "bass":
+		play sound "block.note_block.bass" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "harp":
+		play sound "block.note_block.harp" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "pling":
+		play sound "block.note_block.pling" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "bit":
+		play sound "block.note_block.bit" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "exp" or "experience":
+		play sound "entity.experience_orb.pickup" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "level", "level up" or "levelup":
+		play sound "entity.player.levelup" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+	else if {_sound} is "challenge" or "challenge complete":
+		play sound "ui.toast.challenge_complete" with volume 0.5 with pitch 1 at {_player}'s location for {_player}
+
+
+function format(n: number, type: integer) :: text:
+	if {_type} is 2:
+		set {_data} to "O,30|o,27|S,24|s,21|Q,18|q,15|T,12|B,9|M,6|k,3"
+		loop split {_data} at "|":
+			set {_s::*} to split loop-value at ","
+			{_n} >= 10 ^ {_s::2} parsed as number
+			return "%{_n} / 10 ^ {_s::2} parsed as number%%{_s::1}%"
+		return "%{_n}%"
+
+
+command /fly:
+    permission: fly
+    permission message: &cYou don't have permission to use this command!
+    trigger:
+        if flight mode of player is true:
+            send "&cYou have disabled Flight!"
+            set flight mode of player to false
+        else:
+            send "&aYou have enabled Flight!"
+            set flight mode of player to true
+
+command /gmc [<player=%sender%>]:
+	permission: gamemodes
+	trigger:
+		set gamemode of arg-1 to creative if gamemode of arg-1 isn't creative
+		send(arg-1, "&aYou have enabled creative.")
+command /gms [<player=%sender%>]:
+	permission: gamemodes
+	trigger:
+		set gamemode of arg-1 to survival if gamemode of arg-1 isn't survival
+		send(arg-1, "&aYou have enabled survival.")
+command /nightvision:
+	aliases: /nv
+	permission: nv
+	trigger:
+		apply night vision of tier 1 without particles to player for 99999 seconds if {nightvision::%player%} is not set
+		remove night vision from player if {nightvision::%player%} is true
+		set {nightvision::%player%} to true if {nightvision::%player%} isn't set
+		delete {nightvision::%player%} if {nightvision::%player%} is true
+command /heal [<player=%sender%>]:
+	permission: heal
+	trigger:
+		heal arg-1
+		send(arg-1, "&aYou have been healed.")
+command /feed [<player=%sender%>]:
+	permission: feed
+	trigger:
+		feed arg-1
+		send(arg-1, "&aYour appetite has been sated.")
+command /invsee <player>:
+	permission: invsee
+	trigger:
+		open inventory of arg-1 to player
+		set {Invsee::%player%} to true
+on inventory click:
+	cancel event if {Invsee::%player%} is true
+on inventory close:
+	delete {Invsee::%player%} if {Invsee::%player%} is true
+command /openinv <player>:
+	permission: openinv
+	trigger:
+		open inventory of arg-1 to player
+command /fixspeed:
+	permission: speed
+	trigger:
+		set {_mode} to "walking" if player isn't flying, else ("flying")
+		set player's flight speed to 0.1 if {_mode} is "flying"
+		set player's walk speed to 0.1 if {_mode} is "walking"
+		send(player, "&aYou have fixed your %{_mode}%")
+

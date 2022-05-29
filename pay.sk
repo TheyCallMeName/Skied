@@ -1,0 +1,28 @@
+command /bal [<offlineplayer>]:
+    aliases: /balance
+    trigger:
+        if arg-1 is not set:
+            send "&b&lBALANCE &8| &f$%{stats::balance::%player%}%"
+            stop
+        else:
+            send "&b&lBALANCE &8| &f$%{stats::balance::%arg-1%}% &7&o(%arg-1%&7&o)"
+
+
+options:
+	mainColor: &b
+	secondColor: &f
+	thirdColor: &7
+ 
+command /pay <player> <number>:
+	trigger:
+		if arg-1 is set:
+			if arg-2 < 1:
+				send "{@mainColor}&lSKIED &7You need to pay more than {@secondColor}$1&7!"
+			if arg-2 > 1:
+				if {stats::balance::%player%} >= arg-2:
+					remove arg-2 from {stats::balance::%player%}
+					add arg-2 to {stats::balance::%arg-1%}
+					send "{@mainColor}&lSKIED&7 You recieved {@secondColor}$%arg-2%&7 from {@secondColor}%player%" to arg-1
+					send "{@mainColor}&lSKIED&7 You sent {@secondColor}$%arg-2%&7 to {@secondColor}%arg-1%" to player
+		if arg-1 is not online:
+			send "{@mainColor}&lSKIED&7 You can't pay a offline player!"

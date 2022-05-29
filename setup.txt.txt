@@ -1,0 +1,14 @@
+dm $age#0001 for setup help
+
+/mv create Islands normal -g VoidGen
+go to 0,64,0 place a bedrock block
+
+Do /resetpoint
+Then also run /admin-delete
+
+!set {Data::IslandTemplate::Pos1}
+!set {Data::IslandTemplate::Pos2}
+
+/savetemplate
+Success — 01/11/2022
+skMorkaz, SkBee, CustomHeads, Skellet, FAWE, VoidGenerator, skript-gui, Mutiverse, Skript

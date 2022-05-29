@@ -1,0 +1,151 @@
+# DO NOT DISTRIBUTE.
+# THIS IS A PAID SKRIPT.
+
+options:
+    fill: gray stained glass pane
+    border-1: black stained glass pane 
+    border-2: black stained glass pane
+
+command /scrapshop:
+    trigger:
+        create a new gui with virtual chest inventory with 5 rows named "Scrap Shop":
+            format gui slot (integers between 0 and 44) with {@fill} named "&7"
+            format gui slot (integers between 0 and 9),(integers between 36 and 44),17,18,26,27, and 35 with black stained glass pane named "&f"
+            format gui slot 10 with shiny blaze rod named "&6&lSell Wand (&f1.5x&6&l)" with lore "%nl%&fCost: &e40,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "&6&lSellwand (&f1.5x&6&l)", 1.5, 40000)
+            format gui slot 11 with shiny blaze rod named "&6&lSell Wand (&f2x&6&l)" with lore "%nl%&fCost: &e110,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "&6&lSellwand (&f2x&6&l)", 2, 110000)
+            format gui slot 12 with shiny blaze rod named "&6&lSell Wand (&f3x&6&l)" with lore "%nl%&fCost: &e350,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "&6&lSellwand (&f3x&6&l)", 3, 350000)
+            format gui slot 13 with paper named "&6&lFly Perk" with lore "%nl%&fCost: &e5.0M Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "fly", 4, 5000000)
+            format gui slot 14 with tripwire hook named "&6&lCommon Key" with lore "%nl%&fCost: &e5,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "common", 4, 5000)
+            format gui slot 15 with tripwire hook named "&6&lUncommon Key" with lore "%nl%&fCost: &e15,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "uncommon", 4, 15000)
+            format gui slot 16 with tripwire hook named "&6&lRare Key" with lore "%nl%&fCost: &e50,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "rare", 4, 50000)
+            format gui slot 19 with tripwire hook named "&6&lLegendary Key" with lore "%nl%&fCost: &e125,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "legendary", 4, 125000)
+            format gui slot 20 with tripwire hook named "&6&lRank Key" with lore "%nl%&fCost: &e500.0M Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "rank", 4, 500000000)
+            format gui slot 20 with shiny diamond pickaxe named "&6&lSilk Pick" with lore "%nl%&fCost: &e5,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "silk", 4, 5000)
+            format gui slot 21 with {spawnerhead} named "&6&lIRON GOLEM SPAWNER" with lore "%nl%&fCost: &e200,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "ig", 4, 200000)
+            format gui slot 22 with {spawnerhead} named "&6&lVILLAGER SPAWNER" with lore "%nl%&fCost: &e300,000 Scraps%nl%&f%nl%&f&nLeft-Click to Purchase":
+                buyItem(player, "villy", 4, 300000)
+        open last gui to player
+
+
+function buyItem(p: player, i: text, t: number, cost: integer):
+    if {_p} can't hold diamond sword named "7dd":
+        send({_p}, "&cYour inventory is full!", "bass")
+    else:
+        if {scrap::%{_p}'s uuid%} >= {_cost}:
+            remove {_cost} from {scrap::%{_p}'s uuid%}
+            giveSellWand({_p}, 1.5, 1) if {_i} is "&6&lSellwand (&f1.5x&6&l)"
+            giveSellWand({_p}, 2, 1) if {_i} is "&6&lSellwand (&f2x&6&l)"
+            giveSellWand({_p}, 3, 1) if {_i} is "&6&lSellwand (&f3x&6&l)"
+            console command "/pex user %{_p}% add fly" if {_i} is "fly"
+            give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to {_p} if {_i} is "common"
+            give 1 of prismarine shard named "&a&lUNCOMMON CRATE KEY" to {_p} if {_i} is "uncommon"
+            give 1 of prismarine shard named "&b&lRARE CRATE KEY" to {_p} if {_i} is "rare"
+            give 1 of prismarine shard named "&e&lRANK CRATE KEY" to {_p} if {_i} is "rank"
+            give 1 of prismarine shard named "&6&lLEGENDARY CRATE KEY" to {_p} if {_i} is "legendary"
+            console command "/givesilkpick %{_p}%" if {_i} is "silk"
+            console command "/ss give %{_p}% iron_golem 1" if {_i} is "ig"
+            console command "/ss give %{_p}% villager 1" if {_i} is "villy"
+            send({_p}, "&aYou have purchased a %{_i}% &afor %{_cost}% &ascraps.", "pling")
+			
+command /givesilkpick <player>:
+	permission: admin
+	trigger:
+		give 1 of {silkpick} to arg-1
+
+			
+on join:
+	set {scrap::%player's uuid%} to 0 if {scrap::%player's uuid%} is not set
+
+
+command /scrap:
+	trigger:
+		
+		send "&c&lSCRAP &8| &fyou have &c%{scrap::%player's uuid%}%✧"
+	
+
+on break of sugar cane:
+	
+	add 1 to {scrap::%player's uuid%}
+
+
+command /givescrap:
+	permission: anon
+	trigger:
+		add 100000 to {scrap::%player's uuid%}
+on break of coal ore:
+	if player is in world "spawnworld":
+		chance of 50%:
+			add 1 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c1✧"
+		else:
+			add 2 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c2✧"
+
+on break of iron ore:
+	if player is in world "spawnworld":
+	
+		chance of 50%:
+			add 3 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c3✧"
+		else:
+			add 5 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c5✧"
+
+on break of gold ore:
+	if player is in world "spawnworld":
+		chance of 50%:
+			add 9 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c9✧"
+		else:
+			add 12 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c12✧"
+		
+on break of diamond ore:
+	if player is in world "spawnworld":
+		chance of 50%:
+			add 15 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c15✧"
+		else:
+			add 27 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c27✧"
+
+on break of emerald ore:
+	if player is in world "spawnworld":
+		chance of 50%:
+			add 112 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c112✧"
+		else:
+			add 152 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c152✧"
+		
+on break of stone:
+	if player is in world "spawnworld":
+		chance of 20%:
+			add 0.1 to {scrap::%player's uuid%}
+			send "&c&lSCRAP &8| &fyou found &c0.1✧"
+		
+	
+		
+command scrappay <player> <number>:
+    trigger:
+        arg-2 < 5:
+            send "&c&lSCRAP &8| &fThe minimum amount you can pay is &c5✧&f."
+            stop
+        arg-2 > {scrap::%player's uuid%}:
+            send "&c&lSCRAP &8| &fNot enough scraps to pay."
+            stop
+        add arg-2 to {scrap::%arg-1's uuid%}
+        remove arg-2 from {scrap::%player's uuid%}
+        send "&c&lSCRAP &8| &fYou received &c%arg-2%✧ &ffrom %player%." to arg-1
+        send "&c&lSCRAP &8| &fYou paid &c%arg-2%✧ &fto %arg-1%." to player

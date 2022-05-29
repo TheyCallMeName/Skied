@@ -1,0 +1,34 @@
+on join:
+  toggle player's scoreboard to on
+  set title of player's scoreboard to "&6&lSKIED &7: &fS1"
+
+function formatt(n: number) :: text:
+   set {_data} to "Dec,30|Oc,27|Sp,24|Sx,21|Qn,18|Qd,15|T,12|B,9|M,6|K,3"
+   loop split {_data} at "|":
+      set {_s::*} to split loop-value at ","
+      {_n} >= 10 ^ {_s::2} parsed as number
+      return "%{_n} / 10 ^ {_s::2} parsed as number%%{_s::1}%"
+   return "%{_n}%"
+
+every 2 seconds:
+  loop all players:
+    set line 1 of loop-player's scoreboard to "&6discord&f.gg&6/skied"
+    set line 2 of loop-player's scoreboard to "&f&l"
+    set line 3 of loop-player's scoreboard to " &6| &fTPS&7: &620.00"
+    set line 4 of loop-player's scoreboard to " &6| &fONLINE&7: &6%number of all players%/500"
+    set line 5 of loop-player's scoreboard to "&f&lSERVER:"
+    set line 6 of loop-player's scoreboard to "&6&l"
+    if {stats.eula::%loop-player%} = 0:
+      set line 7 of loop-player's scoreboard to " &6| &fRANK&7: &8(&7&lMEMBER&8)"
+    if {stats.eula::%loop-player%} = 1:
+      set line 7 of loop-player's scoreboard to " &6| &fRANK&7: &8(&3&lMANOS&8)"
+    if {stats.eula::%loop-player%} = 2:
+      set line 7 of loop-player's scoreboard to " &6| &fRANK&7: &8(&e&lGYRA&8)"
+    if {stats.eula::%loop-player%} = 3:
+      set line 7 of loop-player's scoreboard to " &6| &fRANK&7: &8(&2&lZUME&8)"
+	 
+    set line 8 of loop-player's scoreboard to " &6| &fSCRAP&7: &6%formatt({scrap::%loop-player's uuid%})%✧"
+    set line 9 of loop-player's scoreboard to " &6| &fBALANCE&7: &6$%formatt({stats::balance::%loop-player%})%"
+    set line 10 of loop-player's scoreboard to "&f&lPLAYER:"
+    set line 11 of loop-player's scoreboard to "&c"
+	

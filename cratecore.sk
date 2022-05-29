@@ -1,0 +1,218 @@
+command /givekey:common <player>:
+  permission: givekey.common
+  trigger:
+    give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to arg 1
+
+command /givekey:uncommon <player>:
+  permission: givekey.uncommon
+  trigger:
+    give 1 of prismarine shard named "&a&lUNCOMMON CRATE KEY" to arg 1
+
+command /givekey:rare <player>:
+  permission: givekey.rare
+  trigger:
+    give 1 of prismarine shard named "&b&lRARE CRATE KEY" to arg 1
+
+command /givekey:legendary <player>:
+  permission: givekey.legendary
+  trigger:
+    give 1 of prismarine shard named "&6&lLEGENDARY CRATE KEY" to arg 1
+
+
+command /givekey:rank <player>:
+  permission: givekey.rank
+  trigger:
+    give 1 of prismarine shard named "&e&lRANK CRATE KEY" to arg 1
+	
+	
+	
+on right click:
+  if player's world is not "spawnworld": #anon says dont touch this
+    stop
+  if event-block is yellow stained glass:
+    if player's held item is prismarine shard named "&e&lRANK CRATE KEY":
+      remove 1 of prismarine shard named "&e&lRANK CRATE KEY" from player's inventory
+      set {rewardCrate} to random integer between 1 and 7
+      if {rewardCrate} is 1:
+        execute console command "givevoucher %player% Coal"
+        send "&b&lCRATES &8| &fYou won &bCoal Rank &ffrom a rare crate."
+      if {rewardCrate} is 2:
+        execute console command "givevoucher %player% Iron"
+        send "&b&lCRATES &8| &fYou won &bIron Rank &ffrom a rare crate."
+      if {rewardCrate} is 3:
+        execute console command "givevoucher %player% Gold"
+        send "&b&lCRATES &8| &fYou won &bGold Rank &ffrom a rare crate."
+      if {rewardCrate} is 4:
+        execute console command "givevoucher %player% Diamond"
+        send "&b&lCRATES &8| &fYou won &bDiamond Rank &ffrom a rare crate."
+      if {rewardCrate} is 5:
+        execute console command "givevoucher %player% Emerald"
+        send "&b&lCRATES &8| &fYou won &bEmerald Rank &ffrom a rare crate."
+    else:
+      send "&bYou are not holding the right key to open this crate!"
+
+command /givevoucher [<player>] [<text>] [<text>]:
+    permission: admin.givevoucher
+    trigger:
+        if arg-2 is "Coal":
+            give arg-1 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fCoal", "&b" and "&7&oThis will overlay other ranks!"
+            send "&b&lRANKS &8| &fYou have been give a &bCoal &frank voucher!" to player   
+        if arg-2 is "Iron":
+            give arg-1 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fIron", "&b" and "&7&oThis will overlay other ranks!"
+            send "&b&lRANKS &8| &fYou have been give a &bIron &frank voucher!" to player   
+        if arg-2 is "Gold":
+            give arg-1 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fGold", "&b" and "&7&oThis will overlay other ranks!"
+            send "&b&lRANKS &8| &fYou have been give a &bGold &frank voucher!" to player   
+        if arg-2 is "Diamond":
+            give arg-1 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fDiamond", "&b" and "&7&oThis will overlay other ranks!"
+            send "&b&lRANKS &8| &fYou have been give a &bDiamond &frank voucher!" to player   
+        if arg-2 is "Emerald":
+            give arg-1 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fEmerald", "&b" and "&7&oThis will overlay other ranks!"
+            send "&b&lRANKS &8| &fYou have been give a &bEmerald &frank voucher!" to player    
+
+on rightclick:
+    if 1 of player's held item is paper:
+        if the 2nd line of the tool's lore is "&bRANK &8| &fCoal":
+            execute console command "pex user %player% group set coal"
+            remove 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fCoal", "&b" and "&7&oThis will overlay other ranks!" from player's inventory
+            send title "&b&lRANK" with subtitle "&fYou have been set to &bCoal &frank!" to player for 25 ticks
+        if the 2nd line of the tool's lore is "&bRANK &8| &fIron":
+            execute console command "pex user %player% group set iron"
+            remove 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fIron", "&b" and "&7&oThis will overlay other ranks!" from player's inventory
+            send title "&b&lRANK" with subtitle "&fYou have been set to &bIron &frank!" to player for 25 ticks
+        if the 2nd line of the tool's lore is "&bRANK &8| &fGold":
+            execute console command "pex user %player% group set gold"
+            remove 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fGold", "&b" and "&7&oThis will overlay other ranks!" from player's inventory
+            send title "&b&lRANK" with subtitle "&fYou have been set to &bGold &frank!" to player for 25 ticks
+        if the 2nd line of the tool's lore is "&bRANK &8| &fDiamond":
+            execute console command "pex user %player% group set diamond"
+            remove 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fDiamond", "&b" and "&7&oThis will overlay other ranks!" from player's inventory
+            send title "&b&lRANK" with subtitle "&fYou have been set to &bDiamond &frank!" to player for 25 ticks
+        if the 2nd line of the tool's lore is "&bRANK &8| &fEmerald":
+            execute console command "pex user %player% group set emerald"
+            remove 1 paper named "&b&lRANK" with lore "&7", "&bRANK &8| &fEmerald", "&b" and "&7&oThis will overlay other ranks!" from player's inventory
+            send title "&b&lRANK" with subtitle "&fYou have been set to &bEmerald &frank!" to player for 25 ticks
+        
+	  
+
+on right click:
+  if player's world is not "spawnworld":
+    stop
+  if event-block is orange stained glass:
+    if 1 of player's held item is prismarine shard named "&6&lLEGENDARY CRATE KEY":
+      remove 1 of prismarine shard named "&6&lLEGENDARY CRATE KEY" from player's inventory
+      set {rewardCrate} to random integer between 1 and 6
+      if {rewardCrate} is 1:
+        add 15000 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &6x15000 Scrap &ffrom a &6legendary crate."
+      if {rewardCrate} is 2:
+        add 750000 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fYou won &6$750,000 &ffrom a &6Legendary crate."
+      if {rewardCrate} is 3:
+        add 25000 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &6x25,000 Scrap &ffrom a &6Legendary crate."
+      if {rewardCrate} is 4:
+        add 15 of prismarine shard named "&a&lUNCOMMON CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fYou won &6x15 Uncommon Keys &ffrom a &6Legendary crate."
+      if {rewardCrate} is 5:
+        add 10 of prismarine shard named "&b&lRARE CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fYou won &6x10 Rare Keys &ffrom a &6Legendary crate."
+      if {rewardCrate} is 6:
+        execute console command "pex user %player% add fly"
+        send "&b&lCRATES &8| &fYou won &6FLY &ffrom a &6Legendary crate."
+    else:
+      send "&bYou are not holding the right key to open this crate!"
+	  
+	  
+on right click:
+  if player's world is not "spawnworld":
+    stop
+  if event-block is lime stained glass:
+    if 1 of player's held item is prismarine shard named "&a&lUNCOMMON CRATE KEY":
+      remove 1 of prismarine shard named "&a&lUNCOMMON CRATE KEY" from player's inventory
+      set {rewardCrate} to random integer between 1 and 7
+      if {rewardCrate} is 1:
+        add 300 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &ax300 Scrap &ffrom a &auncommon crate."
+      if {rewardCrate} is 2:
+        add 150 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fyou won &ax150 Scrap &ffrom a &aUncommon crate"
+      if {rewardCrate} is 3:
+        add 250 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fyou won &ax250 Scrap &ffrom a &aUncommon crate"
+      if {rewardCrate} is 4:
+        add 3 of prismarine shard named "&d&lCOMMON CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fyou won &a3x Common Keys &ffrom a &aUncommon crate"
+      if {rewardCrate} is 5:
+        add 1 of prismarine shard named "&b&lRARE CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fyou won &a1x Rare Key &ffrom a &aUncommon crate"
+      if {rewardCrate} is 6:
+        add 5000 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fyou won &a$5,000 &ffrom a &aUncommon crate"
+      if {rewardCrate} is 7:
+        add 15000 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fyou won &a$15,000 &ffrom a &aUncommon crate"
+    else:
+      send "&bYou are not holding the right key to open this crate!"
+	  
+	 
+on right click:
+  if player's world is not "spawnworld":
+    stop
+  if event-block is pink stained glass:
+    if 1 of player's held item is prismarine shard named "&d&lCOMMON CRATE KEY":
+      remove 1 of prismarine shard named "&d&lCOMMON CRATE KEY" from player's inventory
+      set {rewardCrate} to random integer between 1 and 6
+      if {rewardCrate} is 1:
+        add 300 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &dx300 Scrap &ffrom a &dcommon crate."
+      if {rewardCrate} is 2:
+        add 50 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fyou won &dx50 Scrap &ffrom a &dCommon crate"
+      if {rewardCrate} is 3:
+        add 125 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fyou won &dx125 Scrap &ffrom a &dCommon crate"
+      if {rewardCrate} is 4:
+        add 2 of prismarine shard named "&d&lCOMMON CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fyou won &dx2 Common Key &ffrom a &dCommon crate"
+      if {rewardCrate} is 5:
+        add 1500 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fyou won &d$1,500 &ffrom a &dCommon crate"
+      if {rewardCrate} is 6:
+        add 2500 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fyou won &d$2,500 &ffrom a &dCommon crate"
+    else:
+      send "&bYou are not holding the right key to open this crate!"
+	  
+on right click:
+  if player's world is not "spawnworld":
+    stop
+  if event-block is light blue stained glass:
+    if 1 of player's held item is prismarine shard named "&b&lRARE CRATE KEY":
+      remove 1 of prismarine shard named "&b&lRARE CRATE KEY" from player's inventory
+      set {rewardCrate} to random integer between 1 and 7
+      if {rewardCrate} is 1:
+        set {_spawner} to spawner with nbt "{SpawnData:{id:""minecraft:creeper""},SpawnPotentials:[{Entity:{id:""minecraft:creeper""},Weight:1}]}"
+        set {_spawner}'s name to "Spawner"
+        add 300 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &bx300 Scrap &ffrom a &brare crate."
+      if {rewardCrate} is 2:
+        add 300 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &bx300 Scrap &ffrom a &brare crate."
+      if {rewardCrate} is 3:
+        add 500 to {scrap::%player's uuid%}
+        send "&b&lCRATES &8| &fYou won &bx500 Scrap &ffrom a &brare crate."
+      if {rewardCrate} is 4:
+        add 3 of prismarine shard named "&a&lUNCOMMON CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fYou won &bx3 Uncommon Keys &ffrom a &brare crate."
+      if {rewardCrate} is 5:
+        add 2 of prismarine shard named "&b&lRARE CRATE KEY" to player's inventory
+        send "&b&lCRATES &8| &fYou won &bx2 Rare Keys &ffrom a &brare crate."
+      if {rewardCrate} is 6:
+        add 10000 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fYou won &b$10,000 &ffrom a &brare crate."
+      if {rewardCrate} is 7:
+        add 25000 to {stats::balance::%player%}
+        send "&b&lCRATES &8| &fYou won &b$25,000 &ffrom a &brare crate."
+    else:
+      send "&bYou are not holding the right key to open this crate!"

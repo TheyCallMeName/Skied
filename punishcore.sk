@@ -1,0 +1,871 @@
+# StaffTools
+
+#------------------------------------------#
+#                                          #
+#               StaffTools                 #
+#             By: SkripterMan              #
+#                                          #
+#------------------------------------------#
+
+# Staff tools is used to help your staff control your server. Edit the options below. Replace `Username` with your in-game name. 
+# Replace `Sever_Name` with the ip address of your server. Example: Servername.minehut.gg
+
+
+options:
+    owner: TheChickster
+    enabled: false # Enables/Disables lockdown skript
+    servername: Skied.Minehut.gg
+
+
+
+
+# Other
+
+on load:
+    if {antibotamount} is not set:
+        set {antibotamount} to 5
+    send "&3[&bStaffTools&3] &bStaffTools has been loaded. &8| &bVersion 3.1.0" to all players where [input has permission "stafftools.admin"]
+
+# Lockdown code
+
+
+
+command /lockdown [<text>]:
+    trigger:
+        if {@enabled} is true:
+            if player is "{@owner}":
+                if {lockdown} is not set:
+                    broadcast "&4&lLOCKDOWN &cDue to a server threat, the server is locked down. Commands and chat will be disabled during this time."
+                    set {lockdown} to true
+                else:
+                    broadcast "&4&lLOCKDOWN &cThe server is no longer locked down."
+                    delete {lockdown}
+            else:
+                send "&cOnly the owner can preform this action"
+        else:
+            send "&cTo enable this go into the skript. Under options replace SkripterMan with your IGN and replace false with true."
+
+
+command /lockconsole:
+    trigger:
+        if {@enabled} is true:
+            if player is "{@owner}":
+                if {clockdown} is not set:
+                    send "&cYou have toggled off console commands, THIS IS A VERY DANGEROUS COMMAND, ONLY USE WHEN YOU MUST!"
+                    set {clockdown} to true
+                else:
+                    send "&cYou have toggled on console commands"
+                    delete {clockdown}
+            else:
+                send "&cOnly the owner can preform this action"
+        else:
+            send "&cTo enable this go into the skript. Under options replace SkripterMan with your IGN and replace false with true."
+
+on command:
+    if executor is not a player:
+        command is not "lockconsole"
+        if {clockdown} is set:
+            cancel event
+
+on command:
+    executor is a player
+    if player is not "{@owner}":
+        if {lockdown} is set:
+            send "&cCommands are currently disabled."
+            cancel event
+
+on chat:
+    executor is a player
+    if player is not "{@owner}":
+        if {lockdown} is set:
+            send "&cChat is currently disabled."
+            cancel event
+
+on command:
+    {AntiMaliciousCommands} is set
+    if player does not have permission "op":
+        if command contains "me" or ":" or "plugins" or "?" or "help":
+            cancel event
+            send "&cThis command is disabled. If you are an administrator you can enable it with &4/stconfig AntiMaliciousCommands"
+
+# Alternate accounts code
+
+on connect:
+    if {altts.%ip of player%::*} does not contain ("%player%" parsed as offline player):
+        add ("%player%" parsed as offline player) to {altts.%ip of player%::*}
+    add 1 to {logins2-ip.%ip of player%}
+    add 1 to {logins2.%uuid of player%}
+    set {ip2.%uuid of player%} to ip of player
+    if size of {altts.%ip of player%::*} >= 2:
+        message "&3&lALTS &8| &b%player%" to all players where [input has permission "alts.view"]
+        set {_alts} to "%{altts.%{ip2.%uuid of player%}%::*}%"
+        replace all " and" with "" in {_alts}
+        message "%{_alts}%" to all players where [input has permission "alts.view"]
+
+on join:
+    if {antibotalts::%ip of player%::*} does not contain "%player%":
+        add "%player%" to {antibotalts::%ip of player%::*}
+    if size of {antibotalts::%ip of player%::*} >= {antibotamount}:
+        {antibot} is set
+        kick player due to "&cToo many ip connected to this account!"
+
+
+
+
+command /alts [<offline player>] [<text>]:
+    trigger:
+        if player has permission "alts.view":
+            if arg 1 is not set:
+                message "&cUsage: /alts <player>"
+            else:
+                if size of {altts.%ip of arg-1%::*} is 0:
+                    message "&cAn error occurred whilst attempting to perform this command."
+                else:
+                    message "&3&lALTS &8| &b%player%"
+                    set {_alts} to "%{altts.%{ip2.%uuid of player%}%::*}%"
+                    replace all " and" with "" in {_alts}
+                    message "%{_alts}%"
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+
+
+on chat:
+    if player has permission "staffchat.use":
+        if first character of message is "##":
+            set {_g} to message
+            replace all "##" with "" in {_g}
+            cancel event
+            send "&3[&bSC&3] &3%player%&3: &d%{_g}%" to all players where [input has permission "staffchat.use"]
+
+# Other
+
+command /commandspy:
+    trigger:
+        if player has permission "commandspy.use":
+            if {staffspy::%player's uuid%} is not set:
+                send "&fStaff spy has been enabled. You can now view commands executed by players."
+                set {staffspy::%player's uuid%} to true
+            else:
+                delete {staffspy::%player's uuid%}
+                send "&fStaff spy has been disabled. You can no longer view commands executed by players."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."       
+
+on command:
+    send "&b%player%&f has executed command &b/%full command%&b." to all players where [{staffspy::%input's uuid%} is set]
+
+command /clearhistory [<player>]:
+    trigger:
+        if player has permission "clearhistory.use":
+            if arg-1 is set:
+                if {punish-history.%uuid of arg-1%::*} is 0:
+                    send "&bThis player has not punishment history."
+                else:
+                    send "&b%arg-1%&b's &fpunishment history has been cleared."
+                    delete {punish-history.%uuid of arg-1%::*}
+            else:
+                send "&cUsage: /clearhistory <player>"
+            
+# Chat utilities
+
+command /mutechat [<text>]:
+    trigger:
+        if player has permission "mutechat.use":
+            if {mutechat} is not set:
+                broadcast "&b♢ &fChat has been muted."
+                set {mutechat} to true
+            else:
+                broadcast "&b♢ &fChat has been unmuted."
+                delete {mutechat}
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+        
+on chat:
+    if {mutechat} is set:
+        player doesn't have permission "mutechat.bypass"
+        cancel event
+        send "&cChat is currently disabled!"
+
+command /clearchat [<text>]:
+    trigger:
+        if player has permission "clearchat.use":
+            clearChat(player)
+            wait 3 tick
+            broadcast "&b♢ &fChat has been cleared."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+function clearChat(p: player):
+    loop 200 times:
+        broadcast "&f"
+
+command /slowchat:
+    trigger:
+        if player has permission "slowchat.use":
+            if {slowchat} is not set:
+                set {slowchat} to true
+                broadcast "&b♢ &fSlowchat is now enabled."
+            else:
+                delete {slowchat}
+                broadcast "&b♢ &fSlowchat is now disabled."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+  
+on chat:
+    if {slowchat} is set:
+        player does not have permission "slowchat.bypass"
+        set {_waited} to difference between {cc::%player%::lastused} and now
+        if {_waited} is less than 2 second:
+            cancel event
+            message "&cYou have to wait %difference between 2 second and {_waited}%&c before you can talk again"
+            stop
+        else:
+            set {cc::%player%::lastused} to now
+
+on chat:
+    if {antiswear} is set:
+        set {_g} to message
+        if {_g} contains "fuck" or "bitch" or "nigger" or "ass" or "faggot" or "cum" or "sex" or "s3x" or "wankstain" or "n1gger" or "nigg3r" or "n1gg3r" or "dick" or "penis" or "pussy" or "vagina" or "shit" or "sieg nein" or "nigga":
+            send "&cPlease don't swear!"
+            cancel event
+
+command /stafftools:
+    aliases: st
+    trigger:
+        if player does not have permission "stafftools.admin":
+            send "&3[&bSTAFFTOOLS&3] &bCreated by SkripterMan &8| &bVersion 3.1.0"
+        else:
+            send "&3[&bSTAFFTOOLS&3] &bCreated by SkripterMan &8| &bVersion 3.1.0"
+            send "&f"
+            send "&3&lEVERYONE:"
+            send "&b/report: &fSends a report to staff &8| &freports.view"
+            send "&3&lMODERATION:"
+            send "&b/clearchat: &fClears chat &8| &fclearchat.use"
+            send "&b/mutechat: &fPrevents people from chatting &8| &fmutechat.use, mutechat.bypass"
+            send "&b/tmute <player> <1s/1m/1h/1d> <reason> [-s]: &fMutes someone for a custom duration. (The -s makes it a silents punishments. In other words only staff can see it.) &8| &fpunishments.use"
+            send "&b/tban <player> <1s/1m/1h/1d> <reason> [-s]: &fBans someone for a custom duration. &8| &fpunishments.use"
+            send "&b/warn <player> <reason> [-s]: &fWarns someone. &8| &fpunishments.use"
+            send "&b/ban <player> <reason> [-s]: &fPermanently bans someone. &8| &fpunishments.use"
+            send "&b/alts: &fShows someones alts &8| &falts.view"
+            send "&b/staffmode: &fPuts you in vanish mode &8| &fstaffmode.use"
+            send "&b/gmc <player>: &fSets your gamemode to creative &8| &fgamemode.creative.use"
+            send "&b/gms <player>: &fSets your gamemode to survival &8| &fgamemode.survival.use"
+            send "&b/gmsp <player>: &fSets your gamemode to spectator &8| &fgamemode.spectator.use"
+            send "&b/tphere <player>: &fTeleports a player to you &8| &fteleporthere.use"
+            send "&b/tp <player>: &fTeleports you to a player &8| &fteleport.use"
+            send "&b/slowchat: &fToggles chat cooldown on and off &8| &fslowchat.use, slowchat.bypass"
+            send "&b/checkbans <player>: &fChecks how many players a moderator has banned. &8| &fcheckbans.use"
+            send "&b/commandspy <player>: &fViews what commands players are using. &8| &fcommandspy.use"
+            send "&b/check <player>: &fChecks a players punishment status &8| &fcheckstatus.use"
+            send "&b/clearhistory <player>: &fClears a players punishment history &8| &fclearhistory.use"
+            send "&3&lADMINISTRATION:"
+            send "&b/stafftools: &fSends a list of commands &8| &fstafftools.admin"
+            send "&b/stconfig: &fAllows you to config commands &8| &fstafftools.admin"
+            if {@enabled} is false:
+                send "&b/lockdown: &fYou must first enable this in the skripts under options."
+                send "&b/lockconsole: &fYou must first enable this in the skripts under options."
+            else:
+                send "&b/lockdown: &fMakes it so only the owner can use commands. This is in-case of a server hijacking."
+                send "&b/lockconsole: &fDisables commands sent in console. This is in-case of someone misusing console."
+
+
+
+command /stconfig [<text>] [<text>] [<integer>]:
+    trigger:
+        if player has permission "stafftools.admin":
+            if arg-1 is not set:
+                send "&3&lCONFIG MODULES:"
+                send "&b/stconfig smtelportback &8| &fToggles on and off the ability to be teleported back to your orginal location using staff mode."
+                send "&b/stconfig repeatmessages &8| &fToggles on and off the anti-repeat messages module."
+                send "&b/stconfig antiswear &8| &fToggles on and off the anti-swear module."
+                send "&b/stconfig reports &8| &fToggles on and off the report module."
+                send "&b/stconfig antibot &8| &fToggles on and off the bot module. (Kicks people with over %{antibotamount}%&f+ alts)"
+                send "&b/stconfig antibot <integer> &8| &fSets how many alts should trigger the anti-bot."
+                send "&b/stconfig AntiMaliciousCommands &8| &fToggles on and off malicious commands. (/plugins,/me,commands containing "":"", ect)."
+            else if arg-1 is "smteleportback":
+                if {smteleportback} is not set:
+                    set {smteleportback} to true
+                    send "&cThe module &4SMPTELEPORTBACK&c has been toggled on"
+                else if {smteleportback} is set:
+                    delete {smteleportback}
+                    send "&cThe module &4SMPTELEPORTBACK&c has been toggled off"
+            else if arg-1 is "repeatmessages":
+                if {repeatmessages} is not set:
+                    set {repeatmessages} to true
+                    send "&cThe module &4REPEATMESSAGES&c has been toggled on"
+                else if {repeatmessages} is set:
+                    delete {repeatmessages}
+                    send "&cThe module &4REPEATMESSAGES&c has been toggled off"
+            else if arg-1 is "antiswear":
+                if {antiswear} is not set:
+                    set {antiswear} to true
+                    send "&cThe module &4ANTISWEAR&c has been toggled on"
+                else if {antiswear} is set:
+                    delete {antiswear}
+                    send "&cThe module &4ANTISWEAR&c has been toggled off"
+            else if arg-1 is "ANTIBOT":
+                if arg-2 is not set:
+                    if {ANTIBOT} is not set:
+                        set {ANTIBOT} to true
+                        send "&cThe module &4ANTIBOT&c has been toggled on"
+                    else if {ANTIBOT} is set:
+                        delete {ANTIBOT}
+                        send "&cThe module &4ANTIBOT&c has been toggled off"
+                else:
+                    send "&cYou have set the alt limit to &4%arg-2%&c."
+                    set {antibotamount} to arg-2
+            else if arg-1 is "ANTIMALICIOUSCOMMANDS":
+                if {ANTIMALICIOUSCOMMANDS} is not set:
+                    set {ANTIMALICIOUSCOMMANDS} to true
+                    send "&cThe module &4ANTIMALICIOUSCOMMANDS&c has been toggled on"
+                else if {ANTIMALICIOUSCOMMANDS} is set:
+                    delete {ANTIMALICIOUSCOMMANDS}
+                    send "&cThe module &4ANTIMALICIOUSCOMMANDS&c has been toggled off"
+            else if arg-1 is "reports":
+                if {REPORTS} is not set:
+                    set {REPORTS} to true
+                    send "&cThe module &4REPORTS&c has been toggled on"
+                else if {REPORTS} is set:
+                    delete {REPORTS}
+                    send "&cThe module &4REPORTS&c has been toggled off"
+
+            else:
+                send "&cInvalid module."
+
+
+command /gmc [<player>]:
+    trigger:
+        if player has permission "gamemode.creative.use":
+            if arg-1 is not set:
+                send "&3&lGAMEMODE &fYour gamemode has been updated to &bcreative"
+                set player's gamemode to creative
+            else:
+                send "&3&lGAMEMODE &b%arg-1%&b's&f gamemode has been updated to &bcreative"
+                set arg-1's gamemode to creative   
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+command /gms [<player>]:
+    trigger:
+        if player has permission "gamemode.survival.use":
+            if arg-1 is not set:
+                send "&3&lGAMEMODE &fYour gamemode has been updated to &bsurvival"
+                set player's gamemode to survival
+            else:
+                send "&3&lGAMEMODE &b%arg-1%&b's&f gamemode has been updated to &bsurvival"
+                set arg-1's gamemode to spectator    
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+command /gmsp [<player>]:
+    trigger:
+        if player has permission "gamemode.spectator.use":
+            if arg-1 is not set:
+                send "&3&lGAMEMODE &fYour gamemode has been updated to &bspectator"
+                set player's gamemode to spectator
+            else:
+                send "&3&lGAMEMODE &b%arg-1%&b's&f gamemode has been updated to &bspectator"
+                set arg-1's gamemode to spectator    
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+
+
+
+command /tp [<player>]:
+    trigger:
+        if player does not have permission "teleport.use":
+            send "&4(!) &cYou do not have the required permission to run this command."
+        else:
+            if arg-1 is not set:
+                send "&cUsage: /tp <player>"
+            else:
+                send "&fTeleporting to &b%arg-1%"
+                teleport player to arg-1
+
+
+command /tphere [<player>]:
+    trigger:
+        if player does not have permission "teleporthere.use":
+            send "&4(!) &cYou do not have the required permission to run this command."
+        else:
+            if arg-1 is not set:
+                send "&cUsage: /tphere <player>"
+            else:
+                send "&fTeleporting to &b%arg-1%&f to you."
+                teleport arg-1 to player
+
+command /report [<player>] [<text>]:
+    cooldown: 10 seconds
+    cooldown message: "&dThis command is on cooldown"
+    trigger:
+        if {REPORTS} is set:
+            if arg-1 or arg-2 is not set:
+                send "&cUsage: /report <player> <reason>"
+            else if arg-1 is set:
+                send "&aYour report has been sent the staff team"
+                send "&f" to all players where [input has permission "reports.view"]
+                send "&d&lREPORT" to all players where [input has permission "reports.view"]
+                send "&5Sender: &d%player%" to all players where [input has permission "reports.view"]
+                send "&5Offender: &d%arg-1%" to all players where [input has permission "reports.view"]
+                send "&5Reason: &d%arg-2%" to all players where [input has permission "reports.view"]
+                send "&f" to all players where [input has permission "reports.view"]
+        else:
+            send "&cThis module is disabled. Administrators can enable this with &4/stconfig reports&c."
+            
+
+
+
+
+
+command /staffmode [<text>]:
+    aliases: mod, modmode, sm, mm 
+    trigger:
+        if player has permission "staffmode.use":
+            if {staffmode.%uuid of player%} is not set:
+                set {staffmode.%uuid of player%} to true 
+                send "&3&lSTAFF MODE &8» &fYou have &aenabled &fstaff mode."
+                set player's gamemode to spectator
+                if {smteleportback} is set:
+                    set {stafflocation::%player's uuid%} to location of player
+                wipe player's sidebar
+                set name of sidebar of player to "    &3&lSTAFF TOOLS    "
+                set score "&1" in sidebar of player to 12
+                set score "&b&lVANISH" in sidebar of player to 11
+                set score "&7﹄ &a&lENABLED" in sidebar of player to 10
+                set score "&2" in sidebar of player to 9
+                set score "&7&o{@servername}" in sidebar of player to 8
+            else:
+                delete {staffmode.%uuid of player%}
+                send "&3&lSTAFF MODE &8» &fYou have &cdisabled &fstaff mode."
+                set player's gamemode to survival
+                if {smteleportback} is set:
+                    teleport player to {stafflocation::%player's uuid%}
+                wipe player's sidebar
+
+            wait 1 tick 
+            vanishCheck()
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+function vanishCheck():
+    loop all players:
+        loop all players where [{staffmode.%uuid of input%} is set]:
+            if loop-player-1 does not have permission "staffmode.use":
+                hide loop-player-2 from loop-player-1
+            else:
+                reveal loop-player-2 to loop-player-1
+        loop all players where [{staffmode.%uuid of input%} is not set]:
+            reveal loop-player-2 to all players
+on quit:
+    vanishCheck()
+
+on join:
+    vanishCheck()
+on damage:
+    if {staffmode.%uuid of attacker%} is set:
+        cancel event
+    if {staffmode.%uuid of victim%} is set:
+        cancel event
+
+on pickup:
+    if {staffmode.%uuid of player%} is set:
+        cancel event
+
+on chat:
+    if {repeatmessages} is set:
+        if message is {lastmessage::%player's uuid%}:
+            cancel event
+            send "&cPlease do not repeat messages!"
+        set {lastmessage::%player's uuid%} to message
+
+
+
+
+
+# punishments
+
+
+
+
+# New punishments
+
+
+
+command /tempban [<offline player>] [<string>] [<text>]:
+    aliases: tb, tban 
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 3 is not set:
+                message "&7Usage: &3/tempban &c<player> <duration> [-s] <reason>"
+            else:
+                set {_time} to arg 2
+                if {_time} contains "s":
+                    replace all "s" with " seconds" in {_time}
+                else if {_time} contains "m":
+                    replace all "m" with " minutes" in {_time}
+                else if {_time} contains "h":
+                    replace all "h" with " hours" in {_time}
+                else if {_time} contains "d":
+                    replace all "d" with " days" in {_time}
+                set {_time2} to "%{_time}%" parsed as timespan
+                replace all "second" with "SECOND" in {_time}
+                replace all "seconds" with "SECONDS" in {_time}
+                replace all "minute" with "MINUTE" in {_time}
+                replace all "minutes" with "MINUTES" in {_time}
+                replace all "hour" with "HOUR" in {_time}
+                replace all "hours" with "HOURS" in {_time}
+                replace all "day" with "DAY" in {_time}
+                replace all "days" with "DAYS" in {_time}
+                if {_time2} is not a timespan:
+                    message "&cInput a valid duration."
+                else:
+                    loop all offline players where [input is arg 1]:
+                        set {_found} to true
+                    if {_found} is set:
+                        set {_reason} to arg 3 
+                        replace all "-s " with "" in {_reason}
+                        replace all " -s" with "" in {_reason}
+                        replace all "-s" with "" in {_reason}
+                        if length of {_reason} is 0:
+                            message "&7Usage: &3/tempban &c<player> <duration> [-s] <reason>"
+                        else:
+                            set {_executor} to "%player%"
+                            if executor is not a player:
+                                set {_executor} to colored "&cConsole"
+                            set {ban::%uuid of arg-1%::date} to now
+                            set {ban::%uuid of arg-1%::reason} to uncolored {_reason}
+                            set {ban::%uuid of arg-1%::time} to ("%{_time2}%" parsed as timespan)
+                            if {ban::%uuid of arg-1%} is set:
+                                message "&cPrevious punishment for %arg-1% &cremoved."
+                            set {_reason} to arg 3
+                            replace all " -s" with "" in {_reason}
+                            replace all "-s " with "" in {_reason}
+                            replace all "-s" with "" in {_reason}
+                            add 1 to {staffbans::%player's uuid%}
+                            add "&r&3Type: &fBAN &3Staff: &r%{_executor}% &3Issued: &r%{ban::%uuid of arg-1%::date}%%nl%&r&3Length: &f%{ban::%uuid of arg-1%::time}%%nl%&r&3Reason: &r%{_reason}%" to {punish-history.%uuid of arg-1%::*}
+                            if arg 3 contains "-s":
+                                message "&7[SILENT] &3%{_executor}% &7banned &3%arg-1% &7for &c%{_reason}%&7. [%{_time}%&7]" to all players where [input has permission "punishments.use"]
+                            else:
+                                broadcast "&3%{_executor}% &7banned &3%arg-1% &7for &c%{_reason}%&7. [%{_time}%&7]"
+                            set {ban::%uuid of arg-1%} to true
+                            wait 1 tick 
+                            kick arg 1 due to "&cYou are banned from {@servername}.%nl%%nl%%{ban::%uuid of arg-1%::reason}%%nl%%nl%&7&nThis ban will expire in %{_time2}%."
+                    else:
+                        message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+command /ban [<offline player>] [<text>]:
+    aliases: b 
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 2 is not set:
+                message "&7Usage: &3/ban &c<player> [-s] <reason>"
+            else:
+                loop all offline players where [input is arg 1]:
+                    set {_found} to true
+                if {_found} is set:
+                    set {_reason} to arg 2
+                    replace all "-s " with "" in {_reason}
+                    replace all " -s" with "" in {_reason}
+                    replace all "-s" with "" in {_reason}
+                    if length of {_reason} is 0:
+                        message "&7Usage: &3/ban &c<player> <duration> [-s] <reason>"
+                    else:
+                        set {_executor} to "%player%"
+                        if executor is not a player:
+                            set {_executor} to colored "&cConsole"
+                        set {ban::%uuid of arg-1%::date} to now
+                        set {ban::%uuid of arg-1%::reason} to uncolored {_reason}
+                        set {ban::%uuid of arg-1%::time} to "FOREVER"
+                        if {ban::%uuid of arg-1%} is set:
+                            message "&cPrevious punishment for %arg-1% &cremoved."
+                        add 1 to {staffbans::%player's uuid%}
+                        add "&r&3Type: &fBAN &3Staff: &r%{_executor}% &3Issued: &r%{ban::%uuid of arg-1%::date}%%nl%&r&3Length: &f%{ban::%uuid of arg-1%::time}%%nl%&r&3Reason: &r%{_reason}%" to {punish-history.%uuid of arg-1%::*}
+                        if arg 2 contains "-s":
+                            message "&7[SILENT] &3%{_executor}% &7banned &3%arg-1% &7for &c%{_reason}%&7. [FOREVER]" to all players where [input has permission "punishments.use"]
+                        else:
+                            broadcast "&3%{_executor}% &7banned &3%arg-1% &7for &c%{_reason}%&7. [FOREVER]"
+                        set {ban::%uuid of arg-1%} to true
+                        kick arg-1 due to "&cYou are banned from {@servername}.%nl%%nl%&r%{ban::%uuid of arg-1%::reason}%%nl%%nl%&7&nThis ban will never expire."
+                else:
+                    message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+command /unban [<offline player>] [<text>]:
+    aliases: uban, ub
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 1 is not set:
+                message "&7Usage: &3/unban &c<player>"
+            else:
+                loop all offline players where [input is arg 1]:
+                    set {_found} to true
+                if {_found} is set:
+                    set {_executor} to player 
+                    if executor is not a player:
+                        set {_executor} to colored "&cConsole"
+                    if {ban::%uuid of arg-1%} is set:
+                        delete {ban::%uuid of arg-1%}
+                        add "&r&3Type: &fUNBAN &3Staff: &r%{_executor}% &3Issued: &r%now%" to {punish-history.%uuid of arg-1%::*}
+                        if arg-2 is "-s":
+                            message "&7[SILENT] &3%player% &7unbanned &c%arg-1%&7." to all players where [input has permission "punishments.use"]
+                        else:
+                            broadcast "&3%player% &7unbanned &c%arg-1%&7."
+                    else:
+                        message "&c%arg-1% &cis not banned."
+                else:
+                    message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+command /punishments [<offline player>] [<text>]:
+    aliases: puns, history
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 1 is not set:
+                message "&7Usage: &3/punishments &c<player>"
+            else:
+                loop all offline players where [input is arg 1]:
+                    set {_found} to true
+                if {_found} is set:
+                    if size of {punish-history.%uuid of arg-1%::*} is 0:
+                        message "&b%arg-1% &bhas no previous punishments."
+                    else:
+                        message "&3&m------------------------------------------"
+                        loop {punish-history.%uuid of arg-1%::*}:
+                            message colored loop-value
+                        message "&3&m------------------------------------------"    
+                else:
+                    message "&c%arg-1% &chas never played before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+on connect:
+    if {ban::%uuid of player%} is set:
+        if {ban::%uuid of player%::time} is not "FOREVER":
+            if difference between now and {ban::%uuid of player%::date} < {ban::%uuid of player%::time}:
+                set {_dif} to difference between {ban::%uuid of player%::date} and now 
+                set {_dif2} to difference between {_dif} and {ban::%uuid of player%::time}
+                kick player due to "&cYou are banned from {@servername}.%nl%%nl%&r%{ban::%uuid of player%::reason}%%nl%%nl%&7&nThis ban will expire in %{_dif2}%&7&n."
+            else:
+                delete {ban::%uuid of player%}
+        else:
+            kick player due to "&cYou are banned from {@servername}.%nl%%nl%&r%{ban::%uuid of player%::reason}%%nl%%nl%&7&nThis ban will never expire."
+
+
+command /check [<offline player>]:
+    trigger:
+        if executor has permission "checkstatus.use":
+            if difference between now and {mute::%uuid of arg-1%::date} > {mute::%uuid of arg-1%::time}:
+                delete {mute::%uuid of arg-1%}
+            if difference between now and {ban::%uuid of arg-1%::date} > {ban::%uuid of arg-1%::time}:
+                delete {ban::%uuid of arg-1%}
+            if arg-1 is set:
+                if {ban::%uuid of arg-1%} is set:
+                    set {_dif} to difference between {ban::%uuid of arg-1%::date} and now 
+                    set {_dif2} to difference between {_dif} and {ban::%uuid of arg-1%::time}
+                    message "&3&m------------------------------------------"
+                    send "&3User:&f %arg-1%"
+                    send "&3Type: &fBAN"
+                    send "&3Time:&f %{ban::%uuid of arg-1%::time}%"
+                    send "&3Expire: &f%{_dif2}%"
+                    send "&3Reason: &f%{ban::%uuid of arg-1%::reason}%"
+                    message "&3&m------------------------------------------"    
+                else if {mute::%uuid of arg-1%} is set:
+                    set {_dif} to difference between {mute::%uuid of arg-1%::date} and now 
+                    set {_dif2} to difference between {_dif} and {mute::%uuid of arg-1%::time}
+                    message "&3&m------------------------------------------"
+                    send "&3User:&f %arg-1%"
+                    send "&3Type: &fMUTE"
+                    send "&3Time:&f %{mute::%uuid of arg-1%::time}%"
+                    send "&3Expire: &f%{_dif2}%"
+                    send "&3Reason: &f%{mute::%uuid of arg-1%::reason}%"
+                    message "&3&m------------------------------------------"
+                else:
+                    send "&cThis user is not facing any punishment at this time."
+
+            else:
+                send "&cUsage: /check <player>"
+
+
+# Punish
+
+
+command /tempmute [<offline player>] [<string>] [<text>]:
+    aliases: tm, tmute 
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 3 is not set:
+                message "&7Usage: &3/tempmute &c<player> <duration> [-s] <reason>"
+            else:
+                set {_time} to arg 2
+                if {_time} contains "s":
+                    replace all "s" with " seconds" in {_time}
+                else if {_time} contains "m":
+                    replace all "m" with " minutes" in {_time}
+                else if {_time} contains "h":
+                    replace all "h" with " hours" in {_time}
+                else if {_time} contains "d":
+                    replace all "d" with " days" in {_time}
+                set {_time2} to "%{_time}%" parsed as timespan
+                replace all "second" with "SECOND" in {_time}
+                replace all "seconds" with "SECONDS" in {_time}
+                replace all "minute" with "MINUTE" in {_time}
+                replace all "minutes" with "MINUTES" in {_time}
+                replace all "hour" with "HOUR" in {_time}
+                replace all "hours" with "HOURS" in {_time}
+                replace all "day" with "DAY" in {_time}
+                replace all "days" with "DAYS" in {_time}
+                if {_time2} is not a timespan:
+                    message "&cInput a valid duration."
+                else:
+                    loop all offline players where [input is arg 1]:
+                        set {_found} to true
+                    if {_found} is set:
+                        set {_reason} to arg 3 
+                        replace all "-s " with "" in {_reason}
+                        replace all " -s" with "" in {_reason}
+                        replace all "-s" with "" in {_reason}
+                        if length of {_reason} is 0:
+                            message "&7Usage: &3/tempmute &c<player> <duration> [-s] <reason>"
+                        else:
+                            set {_executor} to "%player%"
+                            if executor is not a player:
+                                set {_executor} to colored "&cConsole"
+                            set {mute::%uuid of arg-1%::date} to now
+                            set {mute::%uuid of arg-1%::reason} to uncolored {_reason}
+                            set {mute::%uuid of arg-1%::time} to ("%{_time2}%" parsed as timespan)
+                            if {mute::%uuid of arg-1%} is set:
+                                message "&cPrevious punishment for %arg-1% &cremoved."
+                            set {_reason} to arg 3
+                            replace all " -s" with "" in {_reason}
+                            replace all "-s " with "" in {_reason}
+                            replace all "-s" with "" in {_reason}
+                            add "&r&3Type: &fmute &3Staff: &r%{_executor}% &3Issued: &r%{mute::%uuid of arg-1%::date}%%nl%&r&3Length: &f%{mute::%uuid of arg-1%::time}%%nl%&r&3Reason: &r%{_reason}%" to {punish-history.%uuid of arg-1%::*}
+                            if arg 3 contains "-s":
+                                message "&7[SILENT] &3%{_executor}% &7muted &3%arg-1% &7for &c%{_reason}%&7. [%{_time}%&7]" to all players where [input has permission "punishments.use"]
+                            else:
+                                broadcast "&3%{_executor}% &7muted &3%arg-1% &7for &c%{_reason}%&7. [%{_time}%&7]"
+                            set {mute::%uuid of arg-1%} to true
+                            wait 1 tick 
+                    else:
+                        message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+
+
+
+command /warn [<offline player>] [<text>]:
+    aliases: w
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 2 is not set:
+                message "&7Usage: &3/warn &c<player> [-s] <reason>"
+            else:
+                loop all offline players where [input is arg 1]:
+                    set {_found} to true
+                if {_found} is set:
+                    set {_reason} to arg 2
+                    replace all "-s " with "" in {_reason}
+                    replace all " -s" with "" in {_reason}
+                    replace all "-s" with "" in {_reason}
+                    if length of {_reason} is 0:
+                        message "&7Usage: &3/warn &c<player> <duration> [-s] <reason>"
+                    else:
+                        set {_executor} to "%player%"
+                        if executor is not a player:
+                            set {_executor} to colored "&cConsole"
+                        set {warn::%uuid of arg-1%::date} to now
+                        set {warn::%uuid of arg-1%::reason} to uncolored {_reason}
+                        if {warn::%uuid of arg-1%} is set:
+                            message "&cPrevious punishment for %arg-1% &cremoved."
+                        add "&r&3Type: &fWARN &3Staff: &r%{_executor}% &3Issued: &r%{warn::%uuid of arg-1%::date}%%nl%&r&3Reason: &r%{_reason}%" to {punish-history.%uuid of arg-1%::*}
+                        if arg 2 contains "-s":
+                            message "&7[SILENT] &3%{_executor}% &7warned &3%arg-1% &7for &c%{_reason}%&7." to all players where [input has permission "punishments.use"]
+                        else:
+                            broadcast "&3%{_executor}% &7warned &3%arg-1% &7for &c%{_reason}%&7."
+                else:
+                    message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+command /unmute [<offline player>] [<text>]:
+    aliases: umute, ub
+    trigger:
+        if executor has permission "punishments.use":
+            if arg 1 is not set:
+                message "&7Usage: &3/unmute &c<player>"
+            else:
+                loop all offline players where [input is arg 1]:
+                    set {_found} to true
+                if {_found} is set:
+                    set {_executor} to player 
+                    if executor is not a player:
+                        set {_executor} to colored "&cConsole"
+                    if {mute::%uuid of arg-1%} is set:
+                        delete {mute::%uuid of arg-1%}
+                        add "&r&3Type: &fUNmute &3Staff: &r%{_executor}% &3Issued: &r%now%" to {punish-history.%uuid of arg-1%::*}
+                        if arg-2 is "-s":
+                            message "&7[SILENT] &3%player% &7unmuted &c%arg-1%&7." to all players where [input has permission "punishments.use"]
+                        else:
+                            broadcast "&3%player% &7unmuted &c%arg-1%&7."
+                    else:
+                        message "&c%arg-1% &cis not muted."
+                else:
+                    message "&c%arg-1% &chas never joined before."
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+
+
+on chat:
+    if {mute::%uuid of player%} is set:
+        if {mute::%uuid of player%::time} is not "FOREVER":
+            if difference between now and {mute::%uuid of player%::date} < {mute::%uuid of player%::time}:
+                set {_dif} to difference between {mute::%uuid of player%::date} and now 
+                set {_dif2} to difference between {_dif} and {mute::%uuid of player%::time}
+                cancel event
+                send "&cYou are muted from {@servername}.%nl%%nl%&r%{mute::%uuid of player%::reason}%%nl%%nl%&7&nThis mute will expire in %{_dif2}%&7&n."
+            else:
+                delete {mute::%uuid of player%}
+        else:
+            send "&cYou are muted from {@servername}.%nl%%nl%&r%{mute::%uuid of player%::reason}%%nl%%nl%&7&nThis mute will never expire."
+
+
+
+
+
+
+
+
+
+
+command /checkbans [<offline player>]:
+    trigger:
+        if player has permission "checkbans.use":
+            if {staffbans::%arg-1's uuid%} is not set:
+                set {staffbans::%arg-1's uuid%} to 0
+                set {staffbans::%player's uuid%} to 0
+            if {staffbans::%player's uuid%} is not set:
+                set {staffbans::%arg-1's uuid%} to 0
+                set {staffbans::%player's uuid%} to 0
+            wait 2 tick
+            if arg-1 is set:
+                send "&3&lBANS &8| &b%arg-1%"
+                send "&bBans: &f%{staffbans::%arg-1's uuid%}%"
+            else:
+                send "&3&lBANS &8| &b%player%"
+                send "&bBans: &f%{staffbans::%player's uuid%}%"
+        else:
+            send "&4(!) &cYou do not have the required permission to run this command."
+

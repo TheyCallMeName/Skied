@@ -1,0 +1,34 @@
+command /keyallcommon:
+    permission: admin
+    trigger:
+        give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to all players
+        send "&b&lKEYALL &8| &7You recieved a &dCommon key" to all players
+			
+command /keyalluncommon:
+    permission: admin
+    trigger:
+        give 1 of prismarine shard named "&a&lUNCOMMON CRATE KEY" to all players
+        send "&b&lKEYALL &8| &7You recieved a &aUncommon key" to all players
+			
+command /keyallrare:
+    permission: admin
+    trigger:
+        give 1 of prismarine shard named "&b&lRARE CRATE KEY" to all players
+        send "&b&lKEYALL &8| &7You recieved a &bRare key" to all players
+		
+command /keyallleg:
+    permission: admin
+    trigger:
+        give 1 of prismarine shard named "&6&lLEGENDARY CRATE KEY" to all players
+        send "&b&lKEYALL &8| &7You recieved a &6Legendary key" to all players
+			
+command /me:
+	trigger:
+	
+		send "no" to player
+		stop
+	
+command /minecraft:me:
+	trigger:
+		send "no" to player
+		stop

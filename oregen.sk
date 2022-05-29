@@ -1,0 +1,14 @@
+on block form of cobblestone:
+    set event-block to stone
+    chance of 20%:
+        set event-block to coal ore
+    chance of 13%:
+        set event-block to iron ore
+    chance of 10%:
+        set event-block to lapis ore
+    chance of 5%:
+        set event-block to gold ore
+    chance of 3%:
+        set event-block to diamond ore
+    chance of 2%:
+        set event-block to emerald ore

@@ -1,0 +1,128 @@
+options:
+	prefix: &6&lCONVERT &8•
+	main: &6
+	other: &e
+	other2: &7
+	perm: Admin
+	np: &cYou don't have access to that command.
+	type: shiny blaze rod
+
+on right click on chest with blaze rod:
+	if player is in world "Islands":
+		if player's gamemode is not creative:
+			set {_bound::*} to bound at player
+			set {_b} to "%{_bound::1}%"
+			if {_b} doesn't match {Islands::%player%}:
+				cancel event
+			else:
+				cancel event
+				set {_name} to uncolored name of player's tool
+				replace all "(" and ")" and "Sell Wand" and "x" with "" in {_name}
+				set {_name} to {_name} parsed as number
+				sell(player, (inventory of clicked block), {_name})
+
+function giveSellWand(p: player, type: number, amount: number):
+	give {_p} {@type} named "{@main}&lSell Wand (&f%{_type}%&fx{@main}&l)" with lore "&7Right-Click a chest%nl%&7to sell!"
+
+command /sellwands <text> [<player>] [<number>] <number>:
+	aliases: /sellwand
+	permission: {@perm}
+	permission message: {@np}
+	usage: {@prefix} {@other}Usage: /sellwand give (player) (type) (amount)
+	trigger:
+		arg 1 is "give"
+		giveSellWand(player, arg 3, arg 4)
+
+
+command /setworth <number>:
+	permission: Op
+	permission message: &cNo permission.
+	usage: &c/setworth (money) (new worth)
+	trigger:
+		player's tool isn't air
+		set {_oldvalue} to {sellprice::%1 of player's held item%} ? 0
+		set {sellprice::%1 of player's held item%} to arg-2 + 2
+		send "%nl%&6&lMoney Price Updated%nl% &8• &7Item: &f%1 of player's tool%%nl% &8• &7Old Price: &f$%{_oldvalue}%&r%nl% &8• &7New Price: &f$%{sellprice::%1 of player's held item%}%&r%nl%&r"
+		if {items::*} doesn't contain 1 of player's held item:
+			add 1 of player's held item to {items::*}
+command /worth:
+	trigger:
+		send "&eAir has no worth to it!" if player's tool is air
+		stop if player's tool is air
+		send "%nl%&6&lCurrent Worth%nl% &8• &7Item: &f%1 of player's tool%%nl% &8• &7Money: &f$%{sellprice::%1 of player's tool%} ? 0%%nl%&r"
+
+function getItems(inventory: inventory, item: item) :: number:
+	set {_amount} to amount of {_item} in {_inventory}
+	remove {_amount} of {_item} from {_inventory}
+	return {_amount}
+
+command /sell:
+	trigger:
+		sell(player, (player's inventory), 1)
+
+options:
+	prefix: &6&lCONVERT &8•
+
+function autoSellValue(player: player, inventory: inventory, sellWand: number) :: number:
+	loop {items::*}:
+		set {_value} to "%loop-value%" parsed as item
+		set {_%loop-value%} to getItems({_inventory}, {_value})
+		set {_%loop-value%} to {_%loop-value%} * {_sellwand}
+		add {_%loop-value%} * {sellprice::%{_value}%} to {_money}
+	return {_money}
+
+function itemCheckV(item: item, inventory: inventory) :: number:
+	set {_amount} to amount of {_item} in {_inventory}
+	return {_amount}
+
+
+
+function sell(p: player, inventory: inventory, sellwand: number):
+	loop {items::*}:
+		set {_value} to "%loop-value%" parsed as item
+		set {_%loop-value%} to getItems({_inventory}, {_value})
+		set {_%loop-value%} to {_%loop-value%} * {_sellwand}
+		add {_%loop-value%} * {sellprice::%{_value}%} to {_money}
+	if {_money} > 0:
+		add {_money} to {stats::balance::%{_p}%}
+		send "&6&lSOLD! &8• &7You have sold all items and received &a$%format({_money}, 2)%&7." to {_p}
+	else:
+		send({_p}, "&cYou don't have anything to sell.", "bass")
+
+
+command /harvesterhoe <player>:
+	permission: *
+	trigger:
+		give arg-1 a diamond hoe named "&6&lHARVESTER HOE" with lore "&7This will automatically%nl%&7collect your drops from %nl%&7farming." with all flags hidden
+
+command /newhoe:
+	cooldown: 10 minutes
+	cooldown message: &con cooldown.
+	trigger:
+		give player a diamond hoe named "&6&lHARVESTER HOE" with lore "&7This will automatically%nl%&7collect your drops from %nl%&7farming." with all flags hidden
+
+
+	
+on break:
+	if event-block is sugar cane:
+		if player is holding a diamond hoe:
+			name of player's tool contains "&6&lHARVESTER"
+			set {_bound::*} to bound at player
+			set {_b} to "%{_bound::1}%"
+			if {_b} matches {Islands::%player%}:
+				if {AutoSell::%player%} is true:
+					if block above event-block is sugar cane:
+						set block above event-block to air
+						add 1 to {AutoSellDrops::%player%::sugar cane}
+					add 1 to {AutoSellDrops::%player%::sugar cane}
+					clear drops
+				else:
+					if block above event-block is sugar cane:
+						set block above event-block to air
+						give player 1 sugar cane
+					give player drops of event-block
+					clear drops
+			else:
+				send(player, "&cYou can't break crops on others islands!", "bass")
+
+

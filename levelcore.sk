@@ -1,0 +1,150 @@
+on join:
+	set {stats.level::%player%} to 0 if {stats.level::%player%} is not set
+	set {stats.xp::%player%} to 0 if {stats.xp::%player%} is not set
+	set {stats.xpneededforlvlup::%player%} to 25 if {stats.xpneededforlvlup::%player%} is not set
+
+command /stats:
+	trigger:
+		send "      &6&l&nYOUR STATS."
+		send " "
+		send "&7・&6&nLevel&7: &8[&9%{stats.level::%player%}%&8]"
+		send "&7・&6&nXP&7: &8(&6%{stats.xp::%player%}%&7/&6%{stats.xpneededforlvlup::%player%}%&8)"
+		send " "
+		
+
+on break of coal ore:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of iron ore:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of gold ore:
+	add 2 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+		
+on break of diamond ore:
+	add 3 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of emerald ore:
+	add 3 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+		
+on break of oak log:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of wheat:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of sugar cane:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of potato:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of carrot:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+on break of melon:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+		
+on break of pumpkin:
+	add 1 to {stats.xp::%player%}
+	send action bar "&a&l&nXP&8 (&6&n%{stats.xp::%player%}%&7/&6&n%{stats.xpneededforlvlup::%player%}%&8) &8[&9%{stats.level::%player%}%&8]" to player
+	wait 2 ticks
+	if {stats.xp::%player%} >= {stats.xpneededforlvlup::%player%}:
+		remove {stats.xpneededforlvlup::%player%} from {stats.xp::%player%}
+		add 25 to {stats.xpneededforlvlup::%player%}
+		add 1 to {stats.level::%player%}
+		send "&a&l&nLEVEL UP&7・&7you are now level &8[&9%{stats.level::%player%}%&8]"
+		give 1 of prismarine shard named "&d&lCOMMON CRATE KEY" to player
+
+
+		
+	
+	

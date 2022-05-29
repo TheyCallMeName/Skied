@@ -1,0 +1,78 @@
+#leaderboard.sk
+
+options:
+    prefix: &6&lLEADERBOARD
+
+function formatNumber1(n: number) :: string:
+    set {_l::*} to split "k|M|B|T|Q|QT" at "|"
+    set {_i} to min(floor(log({_n})/3), size of {_l::*})
+    return "%{_n}%" if {_i} <= 0
+    set {_i2} to 1000^{_i}
+    return "%{_n}/{_i2}%%{_l::%{_i}%}%"
+
+
+function sort(indices: strings, values: numbers, descending: boolean = true) :: strings:
+    loop {_indices::*}:
+        set {_sort::%{_values::%loop-index%}%.%loop-index%} to loop-value
+    return (reversed {_sort::*}) if {_descending} is true, else {_sort::*}
+
+
+
+function updateLeaderboardBalance():
+    set {_sorted::*} to sort((indices of {stats::balance::*}), {stats::balance::*})
+    set {_total} to formatNumber1(sum({stats::balance::*}))
+    set {_n} to 0
+    loop {_sorted::*}:
+        add 1 to {_n}
+        set {_p} to loop-value parsed as a offline player
+        set {_v} to formatNumber1({stats::balance::%loop-value%})
+        set {_u} to {_p}'s uuid
+        make console execute command "hd setline balance %{_n} + 2% &7##%{_n}%. &7%{_p}%&f: &a%{_v}%$"
+        if {_n} >= 10:
+            exit loop
+function updateLeaderboardScrap():
+    set {_sorted::*} to sort((indices of {scrap::*}), {scrap::*})
+    set {_total} to formatNumber1(sum({scrap::*}))
+    set {_n} to 0
+    loop {_sorted::*}:
+        add 1 to {_n}
+        set {_p} to loop-value parsed as a offline player
+        set {_v} to formatNumber1({scrap::%loop-value%})
+        set {_u} to {_p}'s uuid
+        make console execute command "hd setline scrap %{_n} + 2% &7##%{_n}%. &7%{_p}%&f: &c%{_v}%✧"
+        if {_n} >= 10:
+            exit loop
+function updateLeaderboardLevel():
+    set {_sorted::*} to sort((indices of {stats.level::*}), {stats.level::*})
+    set {_total} to formatNumber1(sum({stats.level::*}))
+    set {_n} to 0
+    loop {_sorted::*}:
+        add 1 to {_n}
+        set {_p} to loop-value parsed as a offline player
+        set {_v} to formatNumber1({stats.level::%loop-value%})
+        set {_u} to {_p}'s uuid
+        make console execute command "hd setline level %{_n} + 2% &7##%{_n}%. &7%{_p}%&f: &8[&9%{_v}%&8]"
+        if {_n} >= 10:
+            exit loop
+
+
+
+
+function PlaySound(plr: player, sound: string, pitch: number):
+    {_sound} != "none"
+    play sound {_sound} at pitch {_pitch} to {_plr}
+
+
+every 11 minutes: 
+    updateLeaderboardBalance()
+    updateLeaderboardScrap()
+    updateLeaderboardLevel()
+
+
+command /updatelb:
+    permission: *
+    trigger:
+        broadcast "{@prefix}&7・&7Leaderboards are being updated!"
+        updateLeaderboardBalance()
+        updateLeaderboardScrap()
+        updateLeaderboardLevel()

@@ -1,0 +1,11 @@
+on death:
+	if victim is iron golem:
+		clear drops
+		drop 5 of iron ingot
+	if victim is villager:
+		clear drops
+		drop 2 of emerald
+	if victim is blaze:
+		clear drops
+		drop 2 of blaze rod
+		drop 1 of diamond

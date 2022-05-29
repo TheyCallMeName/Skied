@@ -1,0 +1,25 @@
+command /wlst:
+    permission: bbg
+    trigger:
+        if {whitelist} is false:
+            set {whitelist} to true
+            send "&4&lWHITELIST &7・The whitelist has been &a&lENABLED"
+        else:
+            set {whitelist} to false
+            send "&4&lWHITELIST &7・The whitelist has been &c&lDISABLED"
+
+on connect:
+    if {whitelist} is true:
+        if player has permission "op":
+            send "&4&lSKIED&7・You have been allowed to connect due to you being an &4&lADMIN &7Or higher."
+        if player has permission "whitelist.bypass":
+            send "&4&lSKIED&7・You have been allowed to connect due to you being an &4&lADMIN &7Or higher."
+        else:
+		
+            kick player due to "%nl% %nl% &4&lSKIED&7・The server is currently &c&lWHITELISTED %nl% %nl% &4&lSKIED&7・Join https://discord.gg/N4FmvhuvvV for &4more information"
+        #deny access
+
+
+command /debugitlol:
+	trigger:
+		send "%{Data::StartingBlock}%"

@@ -1,0 +1,160 @@
+#Skripted by MineralMiner
+
+options:
+	#prefix used in bot commands
+	prefix: !
+	botToken: OTM0NzM0MDA2MzkyNTk4NTQ4.Ye0Y4Q.mT2megGqk0L0V3-FA0-nl7oHOD0
+	botName: Skied
+	#serverName will show in the bot's status as "ServerName (%online% / %max Players%)"
+	serverName: Skied
+	discordMsgFormat: **%player%** » %message%
+	minecraftMsgFormat: &9&lDiscord &8| &3%{_name}% &8» &f%event-message%
+	#Replace with your server's variables, this will prevent chat going through if a player is muted or the chat is muted
+	muteChatVar: {chatDisabled} 
+	playerMutedVar: {muted::%uuid of player%}
+
+	#CHANNEL ID's | Right click a channel to get it's id
+	#dc2mc = Discord to minecraft
+	dc2mc: 934733757934624858
+	console: 927282004205133884
+
+on load:
+	shutdown the bot "{@botName}"
+	wait 5 seconds
+	login to "{@botToken}" with name "{@botName}"
+	set presence of bot "{@botName}" to watching "Loading..."
+	wait 1 second
+	set online status of bot "{@botName}" to online
+	send ":white_check_mark: **Server has started!**" to channel with id "{@dc2mc}" with the bot "{@botName}"	
+	editPresence()
+
+
+on unload:
+	set presence of bot "{@botName}" to watching "Server Is Stopping..."
+	set online status of bot "{@botName}" to do not disturb
+	send ":octagonal_sign: **Server has stopped.**" to channel with id "{@dc2mc}" with the bot "{@botName}"	
+
+#BOT STATUS & Live status embed
+function editPresence():
+	loop all players:
+		add loop-player to {_on::*}
+	if {isWhitelisted} is not true:
+		if size of {_on::*} < 1:
+			set online status of bot "{@botName}" to idle
+			set presence of bot "{@botName}" to playing "{@serverName} | 0 players"
+		else:
+			set online status of bot "{@botName}" to online
+			set presence of bot "{@botName}" to playing "{@serverName} (%size of {_on::*}%/%max players%)"
+	else:
+		set online status of bot "{@botName}" to do not disturb
+		set presence of bot "{@botName}" to playing ">> Maintenance <<"
+	
+#------------------------------------------------------------------------------
+
+function playerEmbed(p: player, event: string):
+	set {_u} to uuid of {_p}
+	make embed:
+		#set title of embed to "**%player%** joined!"
+		set author of the embed to "%{_p}% %{_event}%."
+		set author icon of embed to "https://minotar.net/helm/%{_u}%"
+		if {_event} is "joined":
+			set color of the embed to lime
+		else if {_event} is "left":
+			set color of the embed to red
+		else:
+			set color of the embed to yellow
+	send last made embed to channel with id "{@dc2mc}" with bot "{@botName}"
+
+
+on join:
+	editPresence()
+	player has played before
+	playerEmbed(player, "joined")
+	
+on quit:
+	editPresence()
+	playerEmbed(player, "left")
+
+on first join:
+	playerEmbed(player,"joined for the first time!")
+
+on command:
+	if event-commandsender is not console:
+		if arguments is set:
+			send "**%player%** issued the command: ``/%command% %arguments%``" to  channel with id "{@console}" with the bot "{@botName}"
+		else:
+			send "**%player%** issued the command: ``/%command%``" to  channel with id "{@console}" with the bot "{@botName}"
+	else:
+		if arguments is set:
+			send "**CONSOLE** issued the command: ``/%command% %arguments%``" to  channel with id "{@console}" with the bot "{@botName}"
+		else:
+			send "**CONSOLE** issued the command: ``/%command%``" to channel with id "{@console}" with the bot "{@botName}"
+
+on chat:
+	{{@playerMutedVar}} is not true
+	{{@muteChatVar}} is not true
+	if message contains "@everyone" or "@here":
+		replace all "@everyone" and "@here" with " " in message
+	send "{@discordMsgFormat}" to channel with id "{@dc2mc}" with bot "{@botName}"
+
+command /unlink:
+    trigger:
+        if player has permission "skied.unlink":
+            set {verify::%player%} to false
+        else:
+            send "&e&lSERVER &c&o✖ &fYou don't have permission for this command!" to player
+        
+on join:
+    {verify::%player%} is not set:
+        set {verify::%player%} to false
+        send "&e&lSERVER &c&o✖ &fYou have not linked your account. Please do /link to link your account."
+        
+on join:
+    {verify::%player%} is false:
+        send "&e&lSERVER &c&o✖ &fYou have not linked your account. Please do /link to link your account."
+    
+on first join:
+    set {verify::%player%} to false
+    send "&e&lSERVER &c&o✖ &fYou have not linked your account. Please do /link to link your account."
+
+command /link:
+    trigger:
+        {verify::%player%} is false:
+            set {_e} to a random integer between 10000 and 99999
+            set {code::%{_e}%} to player
+            message "&e&lLINK &a&o✔ &fYour verification code: &e%{_e}%"
+            message "&e&lLINK &a&o✔ &fDo !link (Your Code) in our discord to link!"
+        else:
+            send "&e&lLINK &c&o✖ &fYou have already linked your account!"
+        
+discord command link <text>:
+  description: Link your minecraft account!
+  prefixes: !
+  trigger:
+    if arg-1 is set:
+      if {code::%arg-1%} is set:
+        set {minecraft::%discord id of event-member%} to {code::%arg-1%}
+        set {_uuid} to uuid of {code::%arg-1%}
+        reply with hidden join "You have linked your minecraft account: %{code::%arg-1%}% to your Discord account!" with nl
+        set the nickname of event-member to "%event-member% | %{code::%arg-1%}%" with event-bot
+        set {verify::%{code::%arg-1%}%} to true
+        set {discord::%{code::%arg-1%}%} to event-member
+        set {minecraftname::%event-member%} to {code::%arg-1%}
+        execute console command "givelink %{code::%arg-1%}%"
+        send "&e&lLINK &a&o✔ &fYou have linked to the account: &e%discord name of event-member% &fon discord!" to {minecraftname::%event-member%}
+        delete {code::%arg-1%}
+      else:
+        reply with hidden join "Please type /link ingame to get your verification code" with nl
+    else:
+      reply with hidden join "Please input your verification code, if you do not have one type /link ingame." with nl
+on command "/whitelist off":
+	set {isWhitelisted} to false
+	editPresence()
+on command "/whitelist on":
+	set {isWhitelisted} to true
+	editPresence()
+
+discord command {@prefix}ping:
+	trigger:
+		set {_ping} to ping of bot named "{@botName}"
+		reply with "API latenacy: %{_ping}%"
